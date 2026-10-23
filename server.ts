@@ -15,6 +15,13 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : SERVER_CONFIG.defaultPort;
 
+// Canonical Gemini Models for Celebranza
+const MODELS = {
+  text: 'gemini-3.5-flash',
+  tts: 'gemini-3.8-flash-tts',
+  ttsFallback: 'gemini-3.8-flash-lite-tts',
+};
+
 // Trust proxy headers for reverse proxies (Vercel, Cloudflare, AWS)
 app.set('trust proxy', 1);
 
