@@ -1,6 +1,21 @@
 export type EventType = 'wedding' | 'birthday' | 'community';
 
+export type NavigationTab =
+  | 'home'
+  | 'events'
+  | 'budget'
+  | 'checklist'
+  | 'timeline'
+  | 'vendors'
+  | 'guests'
+  | 'ideas'
+  | 'inspirations'
+  | 'settings';
+
+export type TabType = NavigationTab;
+
 export type VendorStatus = 'confirmed' | 'discussion' | 'shortlisted';
+
 
 export type RSVPStatus = 'attending' | 'declined' | 'pending';
 
@@ -103,4 +118,56 @@ export interface TimelineMilestone {
     title: string;
     completed: boolean;
   }[];
+}
+
+export interface CategoryAllocationItem {
+  category: string;
+  amount: number;
+  percentage: number;
+  note: string;
+}
+
+export interface ItemizedExpenseItem {
+  title: string;
+  category: string;
+  amount: number;
+  vendorName: string;
+  status: 'paid' | 'pending';
+}
+
+export interface TimelineMilestoneItem {
+  title: string;
+  targetDate: string;
+  tasks: string[];
+}
+
+export interface RecommendedVendorItem {
+  name: string;
+  category: string;
+  estimatedCost: number;
+  rating: number;
+  city: string;
+}
+
+export interface OnePromptPlannerData {
+  title: string;
+  type: EventType;
+  city: string;
+  venue: string;
+  date: string;
+  displayDate: string;
+  expectedGuests: number;
+  budget: number;
+  budgetPerGuest: number;
+  marketBenchmarkNotes: string;
+  tagline: string;
+  quote: string;
+  categoryBreakdown: CategoryAllocationItem[];
+  itemizedExpenses: ItemizedExpenseItem[];
+  milestones: TimelineMilestoneItem[];
+  recommendedVendors: RecommendedVendorItem[];
+  logoSvg?: string;
+  logoDataUrl?: string;
+  heroImage: string;
+  bannerImage: string;
 }

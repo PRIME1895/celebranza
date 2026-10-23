@@ -231,15 +231,17 @@ export const VendorsView: React.FC<VendorsViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Status Tabs: All, Confirmed, In Discussion, Shortlisted */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1">
-          {[
-            { id: 'all', label: 'All' },
-            { id: 'confirmed', label: 'Confirmed' },
-            { id: 'discussion', label: 'In Discussion' },
-            { id: 'shortlisted', label: 'Shortlisted' },
-          ].map((tab) => (
+          {(
+            [
+              { id: 'all', label: 'All' },
+              { id: 'confirmed', label: 'Confirmed' },
+              { id: 'discussion', label: 'In Discussion' },
+              { id: 'shortlisted', label: 'Shortlisted' },
+            ] as const
+          ).map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setStatusFilter(tab.id as any)}
+              onClick={() => setStatusFilter(tab.id)}
               className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                 statusFilter === tab.id
                   ? 'bg-zinc-800 text-white border border-zinc-700 shadow-sm'

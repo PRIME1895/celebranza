@@ -157,19 +157,21 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
           {/* Bottom Mobile Navigation Bar matching blueprint */}
           <div className="h-16 bg-[#151720] border-t border-zinc-800/80 px-6 flex items-center justify-between z-20">
-            {[
-              { id: 'home', label: 'Home', icon: Home },
-              { id: 'events', label: 'Events', icon: Calendar },
-              { id: 'vendors', label: 'Vendors', icon: Users },
-              { id: 'ideas', label: 'Ideas', icon: Lightbulb },
-              { id: 'more', label: 'More', icon: MoreHorizontal },
-            ].map((tab) => {
+            {(
+              [
+                { id: 'home', label: 'Home', icon: Home },
+                { id: 'events', label: 'Events', icon: Calendar },
+                { id: 'vendors', label: 'Vendors', icon: Users },
+                { id: 'ideas', label: 'Ideas', icon: Lightbulb },
+                { id: 'more', label: 'More', icon: MoreHorizontal },
+              ] as const
+            ).map((tab) => {
               const Icon = tab.icon;
               const isActive = mobileTab === tab.id;
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setMobileTab(tab.id as any)}
+                  onClick={() => setMobileTab(tab.id)}
                   className={`flex flex-col items-center gap-1 text-[10px] font-medium transition-colors ${
                     isActive ? 'text-[#E07A5F]' : 'text-zinc-500 hover:text-zinc-300'
                   }`}

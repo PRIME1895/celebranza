@@ -13,7 +13,7 @@ import {
   Bot,
   ArrowRight,
 } from 'lucide-react';
-import { EventItem } from '../types.ts';
+import { EventItem, EventType } from '../types.ts';
 
 interface ChatMessage {
   id: string;
@@ -118,7 +118,7 @@ Every time we plan, I'll synthesize a custom minimalist brand logo, budget bluep
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       setMessages((prev) => [
         ...prev,
@@ -139,7 +139,7 @@ Every time we plan, I'll synthesize a custom minimalist brand logo, budget bluep
     const newEvent: EventItem = {
       id: newId,
       title: plan.title || 'New Planned Event',
-      type: (plan.type as any) || 'wedding',
+      type: (plan.type as EventType) || 'wedding',
       date: plan.date || '2026-06-20',
       displayDate: plan.displayDate || '20 Jun 2026',
       venue: plan.venue || 'The Leela Palace, Bengaluru',

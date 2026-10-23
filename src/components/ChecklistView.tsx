@@ -243,7 +243,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                   <label className="block text-zinc-300 font-medium mb-1">Priority</label>
                   <select
                     value={priority}
-                    onChange={(e) => setPriority(e.target.value as any)}
+                    onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white focus:outline-none focus:border-[#E07A5F]"
                   >
                     <option value="low">Low</option>

@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
 import { Sparkles, Calendar, Wand2, ArrowRight, Loader2, Globe, MapPin, Wallet, Users, TrendingUp, CheckCircle2, Download } from 'lucide-react';
-import { EventItem, EventType, Expense, TimelineMilestone, Vendor } from '../types.ts';
+import {
+  EventItem,
+  EventType,
+  Expense,
+  TimelineMilestone,
+  Vendor,
+  OnePromptPlannerData,
+  CategoryAllocationItem,
+  ItemizedExpenseItem,
+  TimelineMilestoneItem,
+  RecommendedVendorItem,
+} from '../types.ts';
 import { validateEventInput, formatCurrencyINR } from '../utils/eventCalculations.ts';
 
 interface CreateEventModalProps {
@@ -30,7 +41,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [aiError, setAiError] = useState<string | null>(null);
-  const [generatedData, setGeneratedData] = useState<any | null>(null);
+  const [generatedData, setGeneratedData] = useState<OnePromptPlannerData | null>(null);
   const [aiSource, setAiSource] = useState<'gemini' | 'fallback' | null>(null);
   const [aiModel, setAiModel] = useState<string | null>(null);
 
@@ -84,9 +95,9 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
       setGeneratedData(resJson.data);
       setAiSource(resJson.source || 'gemini');
       setAiModel(resJson.model || 'gemini-3.5-flash');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setAiError(err.message || 'Unable to connect to Gemini API. Please check your network.');
+      setAiError(err instanceof Error ? err.message : 'Unable to connect to Gemini API. Please check your network.');
     } finally {
       clearTimeout(step1);
       clearTimeout(step2);
@@ -122,7 +133,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     };
 
     const mappedExpenses: Expense[] = (generatedData.itemizedExpenses || []).map(
-      (exp: any, index: number) => ({
+      (exp: ItemizedExpenseItem, index: number) => ({
         id: `exp-ai-${newId}-${index}`,
         eventId: newId,
         title: exp.title || 'Estimated Item',
@@ -135,7 +146,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     );
 
     const mappedMilestones: TimelineMilestone[] = (generatedData.milestones || []).map(
-      (m: any, index: number) => ({
+      (m: TimelineMilestoneItem, index: number) => ({
         id: `ms-ai-${newId}-${index}`,
         eventId: newId,
         phaseTitle: m.title || `Phase ${index + 1}`,
@@ -149,7 +160,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     );
 
     const mappedVendors: Vendor[] = (generatedData.recommendedVendors || []).map(
-      (v: any, index: number) => ({
+      (v: RecommendedVendorItem, index: number) => ({
         id: `ven-ai-${newId}-${index}`,
         eventId: newId,
         name: v.name || 'Premier Vendor',
@@ -457,7 +468,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
                       Estimated Category Allocations (100% Total)
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {generatedData.categoryBreakdown.map((item: any, i: number) => (
+                      {generatedData.categoryBreakdown.map((item: CategoryAllocationItem, i: number) => (
                         <div
                           key={i}
                           className="p-2 rounded-xl bg-zinc-900/80 border border-zinc-800 text-xs flex items-center justify-between"

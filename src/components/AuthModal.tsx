@@ -38,9 +38,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, theme = '
         await signUpWithEmail(email, password, name.trim());
       }
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || 'Authentication failed. Please check credentials or use Demo Planner.');
+      setError(err instanceof Error ? err.message : 'Authentication failed. Please check credentials or use Demo Planner.');
     } finally {
       setLoading(false);
     }
@@ -52,9 +52,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, theme = '
     try {
       await signInWithGoogle();
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || 'Google Sign-In requires valid Firebase Web credentials in .env.');
+      setError(err instanceof Error ? err.message : 'Google Sign-In requires valid Firebase Web credentials in .env.');
     } finally {
       setLoading(false);
     }

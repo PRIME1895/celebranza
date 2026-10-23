@@ -125,15 +125,17 @@ export const GuestsView: React.FC<GuestsViewProps> = ({
       {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2 overflow-x-auto pb-1">
-          {[
-            { id: 'all', label: 'All Guests' },
-            { id: 'attending', label: 'Attending' },
-            { id: 'pending', label: 'Pending' },
-            { id: 'declined', label: 'Declined' },
-          ].map((tab) => (
+          {(
+            [
+              { id: 'all', label: 'All Guests' },
+              { id: 'attending', label: 'Attending' },
+              { id: 'pending', label: 'Pending' },
+              { id: 'declined', label: 'Declined' },
+            ] as const
+          ).map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setFilterRsvp(tab.id as any)}
+              onClick={() => setFilterRsvp(tab.id)}
               className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                 filterRsvp === tab.id
                   ? 'bg-zinc-800 text-white border border-zinc-700 shadow-sm'

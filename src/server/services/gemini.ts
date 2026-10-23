@@ -19,7 +19,9 @@ if (apiKey) {
 /**
  * Robust wrapper for Gemini model invocations with exponential backoff for transient 503 surges
  */
-export async function generateContentWithRetry<T = any>(
+export async function generateContentWithRetry<
+  T = Awaited<ReturnType<GoogleGenAI['models']['generateContent']>>,
+>(
   aiClient: GoogleGenAI,
   params: Parameters<GoogleGenAI['models']['generateContent']>[0],
   maxRetries = 2

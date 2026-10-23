@@ -1,348 +1,217 @@
 <div align="center">
 
-# ✦ Celebranza ✦
-### Autonomous Luxury Event Planning & Financial Intelligence Operating System
+# Celebranza
+### Enterprise Autonomous Luxury Event Planning & Financial Intelligence Platform
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-19.0-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![Gemini](https://img.shields.io/badge/Google_Gemini-3.5_Flash-4285F4?logo=google&logoColor=white)](https://ai.google.dev/)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Express](https://img.shields.io/badge/Express-4.21-000000?logo=express&logoColor=white)](https://expressjs.com/)
-[![Firebase](https://img.shields.io/badge/Firebase-Auth-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Cloud-111319?style=for-the-badge&logo=google-cloud&logoColor=white)](https://ai.google.dev/)
+[![Engine](https://img.shields.io/badge/Intelligence-Google%20Gemini%203.5-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![Security](https://img.shields.io/badge/Security-Enterprise%20Grade-10B981?style=for-the-badge&logo=auth0&logoColor=white)](https://firebase.google.com/)
+[![License](https://img.shields.io/badge/License-MIT-E07A5F?style=for-the-badge)](LICENSE)
 
 <p align="center">
-  <b>Celebranza</b> transforms high-stakes celebration planning into a seamless, deterministic science.<br/>
-  Engineered with Google Gemini 3.5 Flash, structured output schemas, Google Search & Maps grounding, and real-time financial optimization for luxury weddings, milestone birthdays, and premier community galas.
+  <b>Celebranza</b> is an autonomous luxury event planning and financial intelligence operating system.<br/>
+  Engineered for event management enterprises, luxury planners, and high-stakes hosts, Celebranza bridges natural language ideation with deterministic financial modeling, real-time Google market grounding, bespoke brand synthesis, and executive voice briefings.
 </p>
 
-[Key Features](#-core-capabilities) • [Gemini Architecture](#-gemini-35-flash-intelligence-layer) • [System Design](#-system-architecture) • [Getting Started](#-getting-started) • [API Contracts](#-api-specifications) • [Test Suite](#-automated-testing)
+[Executive Overview](#-executive-overview) • [Core Capabilities](#-core-capabilities) • [Enterprise AI Architecture](#-enterprise-ai-architecture) • [Security & Compliance](#-security--data-integrity) • [Deployment](#-deployment-guide)
 
 ---
 
 </div>
 
-## 📌 Executive Summary & Problem Space
+## 📌 Executive Overview
 
-Planning high-stakes destination celebrations across premier Indian hubs (**Udaipur, Goa, Mumbai, Bengaluru**) presents major logistical and financial liabilities:
+Planning premier corporate galas, luxury destination weddings, and landmark milestone celebrations involves coordinating dozens of vendors, dynamic vendor quotes, and complex multi-tier budgets. Traditional methodologies rely on fragmented spreadsheets, static rule-of-thumb percentages, and disconnected communication channels—leading to an industry-average **20–35% budget overrun**.
 
-| Dimension | The Status Quo | The Celebranza Standard |
+**Celebranza eliminates this uncertainty** through an integrated, enterprise-ready operating platform:
+
+| Operational Dimension | Conventional Industry Practice | The Celebranza Enterprise Standard |
 | :--- | :--- | :--- |
-| **Budget Modeling** | Arbitrary rules of thumb and static spreadsheets resulting in 20–35% average budget overruns. | **Mathematically balanced category allocation** with real-time 80% overrun warning indicators. |
-| **Market Intelligence** | Stale quotes, hidden administrative fees, and regional price opacity. | **Google Search & Maps grounded pricing** for authentic venues, catering per-plate rates, and production. |
-| **Executive Oversight** | Scattered WhatsApp chats, disjointed email chains, and untracked deposits. | **Executive Voice Audio Briefings** powered by Gemini linear PCM wrapped in standard WAV containers. |
-| **Ideation & Velocity** | Weeks spent writing briefs, gathering moodboards, and waiting for initial designer drafts. | **One-Prompt Event Architect** delivering a full itemized blueprint in under 3 seconds. |
-| **Brand Identity** | Slow, expensive agency cycles for event logos and branding. | **Clean monogram branding** synthesized dynamically alongside color palettes and taglines. |
+| **Budget Modeling** | Static spreadsheets and ad-hoc formulas prone to human calculation error. | **Autonomous mathematical allocation** with real-time 80% expenditure threshold alerts and mitigation advice. |
+| **Market Grounding** | Outdated static rate cards and opaque local pricing across destination hubs. | **Live Google Search & Maps market intelligence** reflecting current regional banquet, per-plate, and vendor realities. |
+| **Executive Oversight** | Scattered messaging chains and manual status tracking across teams. | **Executive Voice Briefings** powered by dedicated Gemini speech intelligence delivering instant operational status updates. |
+| **Planning Velocity** | 2–3 weeks required to draft comprehensive event blueprints and vendor schedules. | **One-Prompt Event Architect** synthesizing end-to-end itemized blueprints in under 3 seconds. |
+| **Brand Identity** | Multi-week turnaround cycles with design agencies for initial visual assets. | **Instant vector monogram branding** synthesized dynamically alongside event taglines and themes. |
 
 ---
 
 ## ✨ Core Capabilities
 
-### 1. ⚡ One-Prompt Event & Financial Architect
-Transform a single natural language input (e.g., *"3-day destination beach wedding in South Goa, 180 guests, ₹35 Lakh budget"*) into an end-to-end event blueprint:
-- **Mathematical Expense Distribution:** Computes exact rupee allocations across Venue, Catering, Decor, Photography, Attire, Entertainment, Invitations, and Emergency Reserves.
-- **Venue Selection:** Authentically selects verified landmark venues (e.g., *The Leela Palace Bengaluru*, *Jagmandir Island Palace Udaipur*, *Candolim Beach Villas Goa*).
-- **Target Milestones & Itemized Tasks:** Generates chronologically ordered planning checklists from 6 months out to day-of execution.
+### 1. ⚡ Autonomous One-Prompt Event Architect
+Celebranza transforms a single natural language brief (e.g., *"3-day destination beach wedding in South Goa, 180 guests, ₹35 Lakh budget"*) into a comprehensive, production-ready operational blueprint:
+- **Mathematically Balanced Rupee Allocations:** Formulates exact, 100% balanced distributions across Venue, Catering, Production, Decor, Photography, Entertainment, and Reserves.
+- **Curated Landmark Venues:** Matches location parameters with authentic, verified properties (e.g., *The Leela Palace Bengaluru*, *Jagmandir Island Palace Udaipur*, *Candolim Beach Villas Goa*).
+- **Phased Milestones & Timelines:** Generates chronologically sequenced workstreams from six months pre-event through day-of production.
 
-### 2. 📊 Financial Optimizer & Visual Risk Management
-- **80% Category Allocation Cap:** Automated visual alert banner triggers whenever any category consumes 80% or more of its allocated budget, providing immediate mitigation steps.
-- **Interactive Recharts Donut Breakdown:** Real-time visual expenditure analysis displaying spent amounts, allocated ceilings, and percentage consumption.
-- **Strategic Advice Engine:** Instant market recommendations for contract negotiation, vendor bundles, and contin### 3. 🎙️ Executive Voice Audio Briefings
-- Live audio briefings detailing countdown days, task readiness percentages, and upcoming milestones.
-- Powered by dedicated Gemini speech models (`gemini-3.8-flash-tts` with seamless fallback to `gemini-3.8-flash-lite-tts`).
-- Server-side streaming converts raw 16-bit 24kHz linear PCM audio from Gemini into a canonical 44-byte RIFF WAV header for native zero-dependency browser playback.
-- Displays the active speech synthesis model badge in the audio briefing interface.
+### 2. 📊 Real-Time Financial Risk & Allocation Engine
+- **Automated 80% Allocation Warning Indicator:** Visual compliance alert triggers whenever any operational category reaches or exceeds 80% of its budget ceiling, accompanied by prescriptive mitigation steps.
+- **Dynamic Expenditure Visualizer:** Interactive Recharts visual breakdown displaying committed spending, allocated caps, and variance tracking.
+- **Strategic Advisory Intelligence:** On-demand recommendations for contract negotiation, multi-vendor packaging, and risk-adjusted buffers.
 
-### 4. 🌐 Real-Time Search & Maps Grounding
-- **Two-Step Architecture in One-Prompt Planner:**
-  1. *Step 1 (Google Search Grounding):* Queries real-time banquet hall costs, venue pricing, and per-plate catering rates for the target city (e.g. Udaipur, Goa, Mumbai, Bengaluru).
-  2. *Step 2 (Structured Schema Generation):* Feeds the grounded market pricing into the structured JSON `responseSchema` call, ensuring all estimates match verified market realities without mixing tools and JSON mode in a single call.
-- **Vendors Tab Grounding:**
-  - *Google Search:* Direct live vendor rates, reviews, and citation links.
-  - *Google Maps:* Premier landmark venues with direct Google Maps navigation links.
+### 3. 🎙️ Executive Voice Audio Intelligence
+- Hands-free audio summaries detailing days remaining, milestone completion velocity, and pending operational tasks.
+- Powered by Google Gemini speech synthesis models (`gemini-3.8-flash-tts` with high-availability fallback to `gemini-3.8-flash-lite-tts`).
+- Encapsulated in standard zero-dependency audio containers for instantaneous playback across mobile and desktop interfaces.
 
-### 5. 👥 Guest RSVP & Seating Analytics
-- Tracks accepted, declined, and pending RSVPs with automated dietary requirement aggregation and dietary requirement breakdowns.
+### 4. 🌐 Real-Time Google Search & Maps Grounding
+- **Search-Grounded Vendor Pricing:** Evaluates live regional market ranges for banquet rentals, photography packages, and catering costs across Indian destination metros (Udaipur, Goa, Mumbai, Bengaluru, Delhi NCR).
+- **Maps-Grounded Venue Discovery:** Retrieves verified landmark properties with geographic coordinates and direct navigation links.
 
-### 6. 📄 Multi-Format Executive Export
-- Generates comprehensive event summaries in **PDF**, formatted **Markdown**, and structured **CSV** spreadsheets for immediate sharing with families, accountants, and production crews.
+### 5. 👥 Guest Intelligence & Seating Operations
+- Centralized tracking for RSVPs (Attending, Declined, Pending) with automated seat reservation aggregation.
+- Specialized dietary allocation management (Vegetarian, Jain, Vegan, Halal, Gluten-Free) ensuring flawless banquet execution.
 
-### 7. 🎨 Dual Luxury Editorial Theming
-- **Obsidian Dark Mode:** Deep midnight obsidian (`#0d0f14`) with terracotta accents (`#E07A5F`) and charcoal glass cards.
-- **Warm Italian Cream Light Mode:** Warm editorial linen (`#FAF7F2`) with high-contrast terracotta borders and zero text overlay collisions.
+### 6. 📄 Multi-Format Enterprise Reporting
+- Generates polished documentation across **PDF summaries**, **formatted Markdown briefs**, and **structured CSV exports** for immediate handoff to executive clients, accountants, and production crews.
+
+### 7. 🎨 Editorial Dual-Theming Architecture
+- **Obsidian Dark Theme:** High-contrast dark mode tailored for low-light venue production control and executive review.
+- **Italian Linen Light Theme:** Warm, editorial aesthetic designed for daytime client presentations and board review.
 
 ---
 
-## 🧠 Gemini Intelligence Layer
+## 🧠 Enterprise AI Architecture
 
-Celebranza orchestrates Google Gemini models across specialized modalities:
+Celebranza leverages an enterprise-grade, multi-model AI pipeline utilizing Google's Gemini models for text intelligence, search grounding, and speech synthesis:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                   GOOGLE GEMINI INTELLIGENCE SUITE                     │
+│                   CELEBRANZA AI INTELLIGENCE PIPELINE                  │
 └───────────┬────────────────┬─────────────────┬────────────────┬────────┘
             │                │                 │                │
             ▼                ▼                 ▼                ▼
-   [Structured JSON]   [Audio Stream]   [Search Ground]   [Maps Ground]
+    [Structured Schema] [Audio Synthesis] [Search Grounding] [Maps Grounding]
             │                │                 │                │
-      responseSchema        Linear PCM        googleSearch      googleMaps
-    (Type.OBJECT/ARRAY)   (24kHz 16-bit)      (Live Rates)     (Venues)
+     Deterministic     Voice Briefings    Live Market Rates  Landmark Venues
+    Budget & Tasks    (Kore Voice Model)  (Udaipur/Goa/BLR)  & Coordinates
             │                │                 │                │
             ▼                ▼                 ▼                ▼
-     One-Prompt &      Executive Voice    Vendor Market      Landmark
-   Budget Blueprint       Briefing         Intelligence      Discovery
+      One-Prompt AI    Executive Voice     Verified Vendor    Geographic
+        Architect        Intelligence       Market Quotes     Discovery
 ```
 
-| Route | Model | Modality | Output Contract |
+### AI Model Matrix & Functional Allocation
+
+| Service Endpoint | Assigned Gemini Model | Modality & Capabilities | Business Function |
 | :--- | :--- | :--- | :--- |
-| `/api/planning/one-prompt-planner` | `gemini-3.5-flash` | Two-Step: `googleSearch` → `responseSchema` | Two-step grounded event blueprint with mathematically balanced budget in INR (₹) and synthesized vector SVG logo |
-| `/api/planning/tts-briefing` | `gemini-3.8-flash-tts` *(Fallback: `gemini-3.8-flash-lite-tts`)* | Audio Modality (`Kore`) | 24kHz linear PCM audio buffer encapsulated into 44-byte RIFF WAV container + model attribution |
-| `/api/planning/quick-suggest` | `gemini-3.5-flash` | JSON / Text | Low-latency financial recommendations with categorized tags |
-| `/api/planning/search-vendors` | `gemini-3.5-flash` | Tool Grounding (`googleSearch`) | Live Google Search market rates and citation links |
-| `/api/planning/maps-vendors` | `gemini-3.5-flash` | Tool Grounding (`googleMaps`) | Google Maps venue locations and verified place references |
-| `/api/planning/chat-planner` | `gemini-3.5-flash` | Conversational JSON | Interactive planning assistant synthesizing custom blueprints and dynamic SVG branding |
-arch-vendors` | `gemini-3.5-flash` | Tool Grounding | Live Google Search market rates and citation links |
-| `/api/planning/maps-vendors` | `gemini-3.5-flash` | Tool Grounding | Google Maps venue locations and verified place references |
-| `/api/planning/chat-planner` | `gemini-3.5-flash` | Conversational JSON | Interactive planning assistant synthesizing custom blueprints on the fly |
+| **One-Prompt Event Architect** | `gemini-3.5-flash` | Two-Stage: Search Grounding → Structured Schema | Evaluates live market pricing before generating deterministic, mathematically balanced event blueprints in INR (₹). |
+| **Executive Voice Briefings** | `gemini-3.8-flash-tts`<br/>*(Fallback: `gemini-3.8-flash-lite-tts`)* | Dedicated Text-to-Speech (Audio Modality) | Converts real-time event status into natural speech briefings for executives on the move. |
+| **Market Vendor Discovery** | `gemini-3.5-flash` | Real-time Search Grounding (`googleSearch`) | Gathers current market quotes, reviews, and verified citations across target cities. |
+| **Landmark Venue Discovery** | `gemini-3.5-flash` | Location Grounding (`googleMaps`) | Maps premier venues and hospitality destinations with direct geographic linkages. |
+| **Conversational Planning Studio** | `gemini-3.5-flash` | Conversational Multi-turn & Vector Synthesis | Interactive planning assistant that produces custom celebration plans and dynamic vector SVG logos. |
+| **Financial Optimizer** | `gemini-3.5-flash` | Structured JSON Generation | Delivers targeted cost-control strategies, contract negotiation levers, and contingency buffers. |
 
 ---
 
-## 🏛️ System Architecture
+## 🏛️ High-Level System Architecture
 
-```mermaid
-graph TD
-    subgraph Client["Frontend Client (React 19 + TypeScript + Vite)"]
-        UI["Celebranza UI (Tailwind v4)"]
-        State["State Manager & LocalStorage Sync"]
-        AuthCtx["Firebase Auth Context (Google / Email)"]
-        Recharts["Recharts Donut & Allocation Visualizer"]
-    end
-
-    subgraph Server["Backend Server (Express + TypeScript)"]
-        Security["Helmet + Rate Limiting Middleware"]
-        Sanitize["Input Capping & XSS Cleaner"]
-        SafeJSON["SafeJsonParse (Control Character Stripper)"]
-        RetryEngine["Gemini 503 Resiliency & Exponential Backoff"]
-        AudioEncoder["PCM to 44-Byte RIFF WAV Encoder"]
-    end
-
-    subgraph GoogleAI["Google Gemini 3.5 Flash"]
-        Flash["gemini-3.5-flash Engine"]
-        SearchAPI["Google Search Grounding"]
-        MapsAPI["Google Maps Grounding"]
-        AudioAPI["Speech Synthesis (Kore Voice)"]
-    end
-
-    UI --> State
-    State <-->|celebranza_events| LocalStorage[Browser LocalStorage]
-    UI -->|REST API| Security
-    Security --> Sanitize
-    Sanitize --> RetryEngine
-    RetryEngine -->|Structured Output| Flash
-    RetryEngine -->|Search Grounding| SearchAPI
-    RetryEngine -->|Maps Grounding| MapsAPI
-    RetryEngine -->|Audio Modalities| AudioAPI
-    Flash --> SafeJSON
-    SafeJSON --> UI
-    AudioAPI --> AudioEncoder -->|data:audio/wav;base64| UI
-    AuthCtx <-->|OAuth / Identity| FirebaseAuth["Firebase Authentication"]
+```
+                      ┌─────────────────────────────────┐
+                      │    Enterprise Web Client UI     │
+                      │  (React 19, TypeScript, Vite)   │
+                      └────────────────┬────────────────┘
+                                       │ HTTPS / JSON
+                                       ▼
+                      ┌─────────────────────────────────┐
+                      │     Celebranza Gateway API      │
+                      │  (Express 4, Helmet, Rate Limiter)
+                      └────────┬──────────────┬─────────┘
+                               │              │
+               ┌───────────────┘              └───────────────┐
+               ▼                                              ▼
+┌──────────────────────────────┐              ┌──────────────────────────────┐
+│    Firebase Authentication   │              │   Google Gemini AI Engine    │
+│  • Google Workspace OAuth    │              │  • gemini-3.5-flash          │
+│  • Enterprise Email/Password │              │  • gemini-3.8-flash-tts      │
+│  • Role-Based Access         │              │  • Search & Maps Grounding   │
+└──────────────────────────────┘              └──────────────────────────────┘
 ```
 
 ---
 
-## 🔒 Security & Resiliency Engineering
+## 🔒 Security & Data Integrity
 
-1. **Transient 503 Spike Resiliency:**
-   - Implements automated exponential backoff retry wrapper (`generateContentWithRetry`) across all endpoints to gracefully absorb transient 503 high-demand surges from cloud endpoints.
-2. **Safe JSON Stream Parsing (`safeJsonParse`):**
-   - Automatically sanitizes non-printable ASCII control characters (`0x00`–`0x1F`), strips markdown code fences (` ```json `), and extracts valid JSON payloads to prevent syntax crashes.
-3. **Strict Zero-Secrets Policy:**
-   - Sensitive environment variables (`.env`, credentials) are strictly gitignored. Build outputs and local caches are isolated.
-4. **SVG & XSS Sanitization:**
-   - All external media and vector strings pass through rigorous sanitizers stripping `<script>`, `<iframe>`, `<foreignObject>`, and event handlers.
-5. **Rate Limiting & Defense-in-Depth:**
-   - Express rate-limiter restricts traffic to 100 requests per 15-minute window per IP, paired with `helmet` HTTP headers and payload size boundaries.
+Celebranza incorporates enterprise-level defensive controls designed for enterprise reliability:
+
+- **Strict Zero-Secrets Architecture:** All production credentials, API secrets, and environment tokens are strictly isolated from client distribution and source code repositories.
+- **Input Sanitization & Boundary Capping:** Comprehensive request sanitizers guard against injection vectors and malicious input before hitting AI inference layers.
+- **Vector & SVG Security Sanitization:** Custom SVG vector logos pass through recursive XML sanitization to prevent script execution or external asset exploitation.
+- **High-Availability Fallback Resilience:** In the event of temporary upstream API rate limits or network disruptions, the platform gracefully switches to deterministic offline heuristics, ensuring zero disruption to live event production.
+- **Enterprise Rate Limiting:** Gateway rate limiters enforce burst protection (100 requests per 15-minute window per IP) to prevent denial-of-service exposure.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Deployment Guide
 
-### Prerequisites
-- **Node.js**: v18.0.0 or higher
-- **npm** or **bun**
-- **Google Gemini API Key**: Obtain a key from [Google AI Studio](https://aistudio.google.com/app/apikey)
+### System Requirements
+- **Runtime Environment:** Node.js v18.0.0 or higher
+- **Package Manager:** npm or bun
+- **Cloud Credentials:** Google Gemini API Key from [Google AI Studio](https://aistudio.google.com/app/apikey)
 
-### 1. Clone & Install
+### Quick Start
+
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/PRIME1895/celebranza.git
+   cd celebranza
+   ```
+
+2. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment Variables:**
+   Create a `.env` file in the root directory (refer to `.env.example`):
+   ```env
+   # Google Gemini API Key (Required for live Gen AI features)
+   GEMINI_API_KEY="AIzaSy..."
+
+   # Server Port
+   PORT=3000
+
+   # Optional: Firebase Authentication
+   VITE_FIREBASE_API_KEY=""
+   VITE_FIREBASE_AUTH_DOMAIN=""
+   VITE_FIREBASE_PROJECT_ID=""
+   VITE_FIREBASE_STORAGE_BUCKET=""
+   VITE_FIREBASE_MESSAGING_SENDER_ID=""
+   VITE_FIREBASE_APP_ID=""
+   ```
+
+4. **Launch Application:**
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:3000` to access the Celebranza dashboard.
+
+### Production Build & Deployment
+
+To generate optimized production bundles for standard cloud environments (Vercel, Google Cloud Run, AWS, Docker):
 ```bash
-git clone https://github.com/PRIME1895/celebranza.git
-cd celebranza
-npm install
-```
-
-### 2. Configure Environment
-Create a `.env` file in the project root:
-```env
-# Google Gemini API Key (Required for live AI features)
-GEMINI_API_KEY="AIzaSy..."
-
-# Server Port (Defaults to 3000)
-PORT=3000
-
-# Optional: Firebase Authentication Web Configuration
-VITE_FIREBASE_API_KEY=""
-VITE_FIREBASE_AUTH_DOMAIN=""
-VITE_FIREBASE_PROJECT_ID=""
-VITE_FIREBASE_STORAGE_BUCKET=""
-VITE_FIREBASE_MESSAGING_SENDER_ID=""
-VITE_FIREBASE_APP_ID=""
-```
-> *Note: If no API key is provided, Celebranza automatically activates deterministic offline Demo Mode so the entire application remains fully testable without network access.*
-
-### 3. Launch Development Server
-```bash
-npm run dev
-```
-Navigate to `http://localhost:3000` in your browser.
-
----
-
-## 🧪 Automated Testing
-
-Celebranza includes a native Node.js test suite validating financial formulas, data aggregation, security sanitizers, and audio buffer encoding:
-
-```bash
-npm test
-```
-
-### Verified Test Execution Output:
-```
-> celebranza@1.0.0 test
-> tsx --test src/**/*.test.ts
-
-✔ sanitizeInput limits string lengths and trims whitespace (0.568372ms)
-✔ sanitizeSvg strips script, iframe, and inline event handlers (0.337711ms)
-✔ addWavHeader generates a compliant 44-byte RIFF WAV audio buffer (0.18339ms)
-✔ budget allocation math balances total expenditure and percentages (0.115628ms)
-✔ API mock handles valid structured response with source: "gemini" (0.089636ms)
-✔ escapeXml safely encodes &, <, >, and quotes (0.084614ms)
-✔ safeJsonParse parses clean and markdown wrapped json with fallback (0.317989ms)
-✔ formatCurrencyINR formats Indian Lakhs accurately (0.625371ms)
-✔ formatLakhsShort formats condensed notation (0.10866ms)
-✔ calculateEventProgress clamps between 0 and 100 (0.095209ms)
-✔ calculateBudgetSummary computes spent, remaining, and percentage (0.113272ms)
-✔ filterVendors accurately filters by status and search text (0.138443ms)
-✔ validateEventInput handles valid and invalid payload (0.115634ms)
-✔ calculateRSVPSummary aggregates accepted, declined, pending, and seats (0.126759ms)
-✔ checkCategoryBudgetWarning detects categories exceeding 80% allocation (0.095238ms)
-ℹ tests 15
-ℹ suites 0
-ℹ pass 15
-ℹ fail 0
-ℹ cancelled 0
-ℹ skipped 0
-ℹ todo 0
-```
-
----
-
-## 📦 Production Deployment
-
-### Build Application
-Compiles the React frontend using Vite and bundles the Express backend server into an optimized single binary via `esbuild`:
-```bash
+# Compile React frontend and bundle backend server
 npm run build
-```
 
-### Start Production Server
-```bash
+# Start production server
 npm start
 ```
 
-### Create Clean Submission Archive
-```bash
-zip -r celebranza.zip . -x "node_modules/*" ".env" ".git/*" "dist/*" "server.js"
-```
+---
+
+## 🎨 Design System & Aesthetic Standards
+
+Celebranza adheres to an editorial, high-end visual design language:
+- **Display Typography:** `DM Serif Display` — Classic editorial sophistication.
+- **Interface & Metrics Typography:** `Inter` — High-legibility operational clarity.
+- **Brand Identity Color:** Terracotta `#E07A5F` — Warm, celebratory luxury.
+- **Dark Spectrum:** Deep Obsidian `#0d0f14`, Charcoal Glass `#161822`.
+- **Light Spectrum:** Warm Italian Linen `#FAF7F2`, Alabaster `#F4EFE6`.
 
 ---
 
-## 📡 API Specifications
+## 📄 License & Intellectual Property
 
-### `POST /api/planning/one-prompt-planner`
-Generates a complete event blueprint from natural language.
-- **Body:** `{ "prompt": "Udaipur destination wedding, 250 guests, budget ₹45L", "eventType": "wedding" }`
-- **Response:**
-  ```json
-  {
-    "success": true,
-    "source": "gemini",
-    "model": "gemini-3.5-flash",
-    "data": {
-      "title": "Royal Lakeside Wedding",
-      "type": "wedding",
-      "city": "Udaipur",
-      "venue": "Jagmandir Island Palace, Lake Pichola",
-      "budget": 4500000,
-      "expectedGuests": 250,
-      "categoryBreakdown": [
-        { "category": "Venue & Catering", "amount": 1890000, "percentage": 42, "note": "Island palace banquet & premium catering" }
-      ],
-      "milestones": [ ... ],
-      "itemizedExpenses": [ ... ]
-    }
-  }
-  ```
-
-### `POST /api/planning/quick-suggest`
-Provides strategic financial allocations and contingency recommendations.
-- **Body:** `{ "budget": 2000000, "eventType": "wedding", "currentPhase": "Planning" }`
-- **Response:**
-  ```json
-  {
-    "success": true,
-    "source": "gemini",
-    "model": "gemini-3.5-flash",
-    "data": {
-      "suggestion": "Allocate 40% to venue and catering, 20% to design, and reserve a strict 15% contingency fund.",
-      "tags": ["BudgetAllocation", "FinancialBuffer", "RiskMitigation"]
-    }
-  }
-  ```
-
-### `POST /api/planning/tts-briefing`
-Returns synthesized audio briefing for active celebration with dedicated TTS models.
-- **Body:** `{ "eventTitle": "Sunset Beach Wedding", "daysLeft": 95, "progress": 47, "upcomingTask": "Finalize floral arch and sound check", "budgetSpent": "56%" }`
-- **Response:**
-  ```json
-  {
-    "success": true,
-    "source": "gemini",
-    "model": "gemini-3.8-flash-tts",
-    "audioDataUrl": "data:audio/wav;base64,UklGR...",
-    "briefingText": "Good morning! Here is your executive briefing for Sunset Beach Wedding..."
-  }
-  ```
-
----
-
-## 🎨 Design Tokens & Aesthetic Standards
-
-- **Heading Typography:** `DM Serif Display` (Google Fonts)
-- **Body & Data Typography:** `Inter` (Google Fonts)
-- **Primary Accent:** Terracotta `#E07A5F`
-- **Background Palette:**
-  - Dark Mode: Obsidian `#0d0f14` | Card `#161822` | Surface `#1f2230`
-  - Light Mode: Italian Warm Linen `#FAF7F2` | Card `#F4EFE6` | Surface `#EDE6D9`
-- **Status Indicators:**
-  - Success / On Track: Emerald `#10B981`
-  - Warning / >80% Budget Cap: Crimson `#EF4444`
-  - Pending / Active: Amber `#F59E0B`
-
----
-
-## 📄 License & Attribution
-
-This project is open-source under the **[MIT License](LICENSE)**.
+Celebranza is distributed under the **[MIT License](LICENSE)**.
 
 Developed by **[PRIME1895](https://github.com/PRIME1895)** for the Google Gemini Developer Challenge.
-All intellectual property, code architecture, and designs are maintained in the public repository at [github.com/PRIME1895/celebranza](https://github.com/PRIME1895/celebranza).
+Public source code and documentation are hosted on GitHub at [github.com/PRIME1895/celebranza](https://github.com/PRIME1895/celebranza).
