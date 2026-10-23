@@ -11,7 +11,7 @@ import {
   Download,
   Trash2,
 } from 'lucide-react';
-import { EventItem, TabType } from '../types.ts';
+import { EventItem } from '../types.ts';
 import { formatCurrencyINR } from '../utils/eventCalculations.ts';
 
 interface EventOverviewProps {
@@ -25,7 +25,7 @@ interface EventOverviewProps {
   onDeleteEvent?: () => void;
   onShare: () => void;
   onExportSummary?: () => void;
-  onNavigateTab: (tab: TabType) => void;
+  onNavigateTab: (tab: any) => void;
 }
 
 export const EventOverview: React.FC<EventOverviewProps> = ({
@@ -44,8 +44,8 @@ export const EventOverview: React.FC<EventOverviewProps> = ({
   const progressPercent = totalTasks > 0 ? Math.round((tasksCompleted / totalTasks) * 100) : 68;
   const [imgError, setImgError] = React.useState(false);
 
-  const subTabs: Array<{ id: TabType; label: string }> = [
-    { id: 'events', label: 'Overview' },
+  const subTabs = [
+    { id: 'overview', label: 'Overview' },
     { id: 'budget', label: 'Budget' },
     { id: 'timeline', label: 'Timeline' },
     { id: 'checklist', label: 'Checklist' },
@@ -64,7 +64,7 @@ export const EventOverview: React.FC<EventOverviewProps> = ({
             key={st.id}
             onClick={() => onNavigateTab(st.id)}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-              st.id === 'events'
+              st.id === 'overview'
                 ? 'bg-zinc-800 text-white border border-zinc-700 shadow-sm'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
             }`}

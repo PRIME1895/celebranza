@@ -116,7 +116,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           setIsPlayingAudio(false);
         }
       }
-    } catch (err: unknown) {
+    } catch (err: any) {
       console.error(err);
       setIsPlayingAudio(false);
       setAudioError('Could not generate speech.');

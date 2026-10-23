@@ -28,7 +28,7 @@ export const InspirationsView: React.FC<InspirationsViewProps> = ({
     { id: 'community', label: 'Community' },
     { id: 'decor', label: 'Decor' },
     { id: 'themes', label: 'Themes' },
-  ] as const;
+  ];
 
   const filteredItems = inspirations.filter((item) => {
     if (activeFilter === 'all') return true;
@@ -97,7 +97,7 @@ export const InspirationsView: React.FC<InspirationsViewProps> = ({
         {filters.map((f) => (
           <button
             key={f.id}
-            onClick={() => setActiveFilter(f.id)}
+            onClick={() => setActiveFilter(f.id as any)}
             className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
               activeFilter === f.id
                 ? 'bg-zinc-800 text-white border border-zinc-700 shadow-sm'

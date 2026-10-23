@@ -6,7 +6,7 @@
 /**
  * Sanitizes and caps untrusted string input
  */
-export function sanitizeInput(text: unknown, maxLength: number = 600): string {
+export function sanitizeInput(text: any, maxLength: number = 600): string {
   if (typeof text !== 'string') return '';
   return text.trim().slice(0, maxLength);
 }
@@ -41,7 +41,7 @@ export function escapeXml(str: string): string {
 /**
  * Safe JSON parser resilient to LLM markdown wrappers, bad control characters, and truncated tokens
  */
-export function safeJsonParse<T>(rawText: string, fallback: T): T {
+export function safeJsonParse<T = any>(rawText: string, fallback: T): T {
   if (!rawText || typeof rawText !== 'string') return fallback;
   try {
     return JSON.parse(rawText);

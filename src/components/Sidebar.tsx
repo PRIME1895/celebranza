@@ -18,8 +18,16 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
 
-import { NavigationTab } from '../types.ts';
-export type { NavigationTab };
+export type NavigationTab =
+  | 'home'
+  | 'events'
+  | 'vendors'
+  | 'ideas'
+  | 'budget'
+  | 'checklist'
+  | 'timeline'
+  | 'guests'
+  | 'settings';
 
 interface SidebarProps {
   currentTab: NavigationTab;

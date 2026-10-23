@@ -17,13 +17,6 @@ import {
 } from 'lucide-react';
 import { EventItem, EventType, Expense, TimelineMilestone, Vendor } from '../types.ts';
 import { formatCurrencyINR } from '../utils/eventCalculations.ts';
-import {
-  OnePromptPlannerData,
-  CategoryAllocationItem,
-  ItemizedExpenseItem,
-  TimelineMilestoneItem,
-  RecommendedVendorItem,
-} from '../server/types/planning.ts';
 
 interface AiOnePromptPlannerModalProps {
   isOpen: boolean;
@@ -51,7 +44,7 @@ export const AiOnePromptPlannerModal: React.FC<AiOnePromptPlannerModalProps> = (
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [generatedData, setGeneratedData] = useState<OnePromptPlannerData | null>(null);
+  const [generatedData, setGeneratedData] = useState<any | null>(null);
   const [aiSource, setAiSource] = useState<'gemini' | 'fallback' | null>(null);
   const [aiModel, setAiModel] = useState<string | null>(null);
 
@@ -91,13 +84,12 @@ export const AiOnePromptPlannerModal: React.FC<AiOnePromptPlannerModalProps> = (
         throw new Error(resJson.error || 'Failed to estimate event blueprint');
       }
 
-      setGeneratedData(resJson.data as OnePromptPlannerData);
+      setGeneratedData(resJson.data);
       setAiSource(resJson.source || 'gemini');
       setAiModel(resJson.model || 'gemini-3.5-flash');
-    } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Unable to connect to Gemini API. Please check network.';
+    } catch (err: any) {
       console.error(err);
-      setError(errorMsg);
+      setError(err.message || 'Unable to connect to Gemini API. Please check network.');
     } finally {
       clearTimeout(stepTimer1);
       clearTimeout(stepTimer2);
@@ -134,7 +126,7 @@ export const AiOnePromptPlannerModal: React.FC<AiOnePromptPlannerModalProps> = (
 
     // Map itemized expenses
     const mappedExpenses: Expense[] = (generatedData.itemizedExpenses || []).map(
-      (exp: ItemizedExpenseItem, index: number) => ({
+      (exp: any, index: number) => ({
         id: `exp-ai-${newId}-${index}`,
         eventId: newId,
         title: exp.title || 'Estimated Item',
@@ -148,7 +140,7 @@ export const AiOnePromptPlannerModal: React.FC<AiOnePromptPlannerModalProps> = (
 
     // Map milestones
     const mappedMilestones: TimelineMilestone[] = (generatedData.milestones || []).map(
-      (m: TimelineMilestoneItem, index: number) => ({
+      (m: any, index: number) => ({
         id: `ms-ai-${newId}-${index}`,
         eventId: newId,
         phaseTitle: m.title || `Phase ${index + 1}`,
@@ -163,7 +155,7 @@ export const AiOnePromptPlannerModal: React.FC<AiOnePromptPlannerModalProps> = (
 
     // Map recommended vendors
     const mappedVendors: Vendor[] = (generatedData.recommendedVendors || []).map(
-      (v: RecommendedVendorItem, index: number) => ({
+      (v: any, index: number) => ({
         id: `ven-ai-${newId}-${index}`,
         eventId: newId,
         name: v.name || 'Premier Vendor',
@@ -429,7 +421,7 @@ export const AiOnePromptPlannerModal: React.FC<AiOnePromptPlannerModalProps> = (
                   </h4>
 
                   <div className="space-y-2">
-                    {generatedData.categoryBreakdown.map((item: CategoryAllocationItem, i: number) => (
+                    {generatedData.categoryBreakdown.map((item: any, i: number) => (
                       <div
                         key={i}
                         className="p-2.5 rounded-xl bg-zinc-900/70 border border-zinc-800/80 text-xs flex items-center justify-between"

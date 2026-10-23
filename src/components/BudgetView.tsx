@@ -139,16 +139,15 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
             const parsed = JSON.parse(trimmed);
             if (Array.isArray(parsed)) {
               suggestionsList = parsed
-                .map((p: { suggestion?: string } | string) => (typeof p === 'string' ? p : p.suggestion))
-                .filter((s): s is string => Boolean(s));
+                .map((p: any) => (typeof p === 'string' ? p : p.suggestion))
+                .filter(Boolean);
               const extractedTags = parsed
-                .flatMap((p: { tags?: string[] } | string) => (typeof p === 'object' && Array.isArray(p.tags) ? p.tags : []))
+                .flatMap((p: any) => (Array.isArray(p.tags) ? p.tags : []))
                 .filter(Boolean);
               if (extractedTags.length > 0) tags = Array.from(new Set(extractedTags));
             } else if (parsed && typeof parsed === 'object') {
-              const obj = parsed as { suggestion?: string; tags?: string[] };
-              if (obj.suggestion) suggestionsList = [obj.suggestion];
-              if (Array.isArray(obj.tags)) tags = obj.tags;
+              if (parsed.suggestion) suggestionsList = [parsed.suggestion];
+              if (Array.isArray(parsed.tags)) tags = parsed.tags;
             }
           } catch {
             // normal string
@@ -165,9 +164,9 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
           }
         }
       } else if (Array.isArray(rawSuggestion)) {
-        suggestionsList = (rawSuggestion as Array<{ suggestion?: string } | string>)
+        suggestionsList = rawSuggestion
           .map((p) => (typeof p === 'string' ? p : p.suggestion))
-          .filter((s): s is string => Boolean(s));
+          .filter(Boolean);
       }
 
       setOptimizerAdvice({
@@ -179,7 +178,7 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
               ],
         tags,
       });
-    } catch {
+    } catch (err) {
       setOptimizerAdvice({
         suggestions: [
           'Venue & Catering takes 36% which is ideal for premier destinations.',
@@ -193,23 +192,8 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
     }
   };
 
-  interface DonutPayloadData {
-    name: string;
-    color: string;
-    amount: number;
-    allocated: number;
-    shareOfTotalPct: number;
-    pctOfAllocated: number;
-    isExceeded?: boolean;
-  }
-
-  interface CustomTooltipProps {
-    active?: boolean;
-    payload?: Array<{ payload: DonutPayloadData }>;
-  }
-
   // Custom Recharts Donut Tooltip
-  const CustomDonutTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
+  const CustomDonutTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -331,17 +315,15 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
 
       {/* Tabs */}
       <div className="flex items-center gap-2">
-        {(
-          [
-            { id: 'overview', label: 'Overview' },
-            { id: 'breakdown', label: 'Category Breakdown' },
-            { id: 'payments', label: 'Payments' },
-            { id: 'tracker', label: 'Cost Tracker' },
-          ] as const
-        ).map((tab) => (
+        {[
+          { id: 'overview', label: 'Overview' },
+          { id: 'breakdown', label: 'Category Breakdown' },
+          { id: 'payments', label: 'Payments' },
+          { id: 'tracker', label: 'Cost Tracker' },
+        ].map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => setActiveTab(tab.id as any)}
             className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
               activeTab === tab.id
                 ? 'bg-zinc-800 text-white border border-zinc-700 shadow-sm'
