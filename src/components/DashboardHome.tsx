@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, ArrowRight, Calendar, Clock, CheckSquare, Users, Sparkles, Globe, Wand2 } from 'lucide-react';
 import { EventItem, EventType, Guest } from '../types.ts';
-import { formatCurrencyINR } from '../utils/eventCalculations.ts';
+import { formatCurrencyINR, calculateDaysLeft } from '../utils/eventCalculations.ts';
 import { DashboardRsvpSummary } from './DashboardRsvpSummary.tsx';
 import { useAuth } from '../context/AuthContext.tsx';
 
@@ -60,15 +60,16 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
     },
   ];
 
-  // Specific stats per event matching blueprint
+  // Dynamically computed stats per event using calculateDaysLeft
   const getEventStats = (ev: EventItem) => {
+    const daysLeft = calculateDaysLeft(ev.date);
     if (ev.id === 'ev-1') {
-      return { daysLeft: 64, progress: 68, tasks: '32/47', vendors: '8/12', badgeBg: 'bg-[#E07A5F]/20 text-[#E07A5F]' };
+      return { daysLeft, progress: 68, tasks: '32/47', vendors: '8/12', badgeBg: 'bg-[#E07A5F]/20 text-[#E07A5F]' };
     }
     if (ev.id === 'ev-2') {
-      return { daysLeft: 39, progress: 45, tasks: '12/28', vendors: '4/9', badgeBg: 'bg-purple-500/20 text-purple-300' };
+      return { daysLeft, progress: 45, tasks: '12/28', vendors: '4/9', badgeBg: 'bg-purple-500/20 text-purple-300' };
     }
-    return { daysLeft: 95, progress: 22, tasks: '8/36', vendors: '3/10', badgeBg: 'bg-emerald-500/20 text-emerald-300' };
+    return { daysLeft, progress: 22, tasks: '8/36', vendors: '3/10', badgeBg: 'bg-emerald-500/20 text-emerald-300' };
   };
 
   return (

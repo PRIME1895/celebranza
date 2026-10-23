@@ -48,15 +48,19 @@ Transform a single natural language input (e.g., *"3-day destination beach weddi
 ### 2. 📊 Financial Optimizer & Visual Risk Management
 - **80% Category Allocation Cap:** Automated visual alert banner triggers whenever any category consumes 80% or more of its allocated budget, providing immediate mitigation steps.
 - **Interactive Recharts Donut Breakdown:** Real-time visual expenditure analysis displaying spent amounts, allocated ceilings, and percentage consumption.
-- **Strategic Advice Engine:** Instant market recommendations for contract negotiation, vendor bundles, and contingency buffer preservation.
-
-### 3. 🎙️ Executive Voice Audio Briefings
+- **Strategic Advice Engine:** Instant market recommendations for contract negotiation, vendor bundles, and contin### 3. 🎙️ Executive Voice Audio Briefings
 - Live audio briefings detailing countdown days, task readiness percentages, and upcoming milestones.
+- Powered by dedicated Gemini speech models (`gemini-3.8-flash-tts` with seamless fallback to `gemini-3.8-flash-lite-tts`).
 - Server-side streaming converts raw 16-bit 24kHz linear PCM audio from Gemini into a canonical 44-byte RIFF WAV header for native zero-dependency browser playback.
+- Displays the active speech synthesis model badge in the audio briefing interface.
 
 ### 4. 🌐 Real-Time Search & Maps Grounding
-- **Search Grounding:** Pulls current market rates, vendor package structures, and negotiation tips.
-- **Maps Grounding:** Queries premier venues, boutique stays, and banquets with verified location metadata and direct Google Maps links.
+- **Two-Step Architecture in One-Prompt Planner:**
+  1. *Step 1 (Google Search Grounding):* Queries real-time banquet hall costs, venue pricing, and per-plate catering rates for the target city (e.g. Udaipur, Goa, Mumbai, Bengaluru).
+  2. *Step 2 (Structured Schema Generation):* Feeds the grounded market pricing into the structured JSON `responseSchema` call, ensuring all estimates match verified market realities without mixing tools and JSON mode in a single call.
+- **Vendors Tab Grounding:**
+  - *Google Search:* Direct live vendor rates, reviews, and citation links.
+  - *Google Maps:* Premier landmark venues with direct Google Maps navigation links.
 
 ### 5. 👥 Guest RSVP & Seating Analytics
 - Tracks accepted, declined, and pending RSVPs with automated dietary requirement aggregation and dietary requirement breakdowns.
@@ -70,20 +74,20 @@ Transform a single natural language input (e.g., *"3-day destination beach weddi
 
 ---
 
-## 🧠 Gemini 3.5 Flash Intelligence Layer
+## 🧠 Gemini Intelligence Layer
 
-Celebranza leverages **Gemini 3.5 Flash** across multiple specialized modalities:
+Celebranza orchestrates Google Gemini models across specialized modalities:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                      GOOGLE GEMINI 3.5 FLASH                          │
+│                   GOOGLE GEMINI INTELLIGENCE SUITE                     │
 └───────────┬────────────────┬─────────────────┬────────────────┬────────┘
             │                │                 │                │
             ▼                ▼                 ▼                ▼
    [Structured JSON]   [Audio Stream]   [Search Ground]   [Maps Ground]
             │                │                 │                │
-     responseSchema        Linear PCM        googleSearch      googleMaps
-   (Type.OBJECT/ARRAY)   (24kHz 16-bit)      (Live Rates)     (Venues)
+      responseSchema        Linear PCM        googleSearch      googleMaps
+    (Type.OBJECT/ARRAY)   (24kHz 16-bit)      (Live Rates)     (Venues)
             │                │                 │                │
             ▼                ▼                 ▼                ▼
      One-Prompt &      Executive Voice    Vendor Market      Landmark
@@ -92,10 +96,13 @@ Celebranza leverages **Gemini 3.5 Flash** across multiple specialized modalities
 
 | Route | Model | Modality | Output Contract |
 | :--- | :--- | :--- | :--- |
-| `/api/planning/one-prompt-planner` | `gemini-3.5-flash` | Structured JSON | Strict `responseSchema` generating full event blueprint with itemized budget, tasks, and vendors |
+| `/api/planning/one-prompt-planner` | `gemini-3.5-flash` | Two-Step: `googleSearch` → `responseSchema` | Two-step grounded event blueprint with mathematically balanced budget in INR (₹) and synthesized vector SVG logo |
+| `/api/planning/tts-briefing` | `gemini-3.8-flash-tts` *(Fallback: `gemini-3.8-flash-lite-tts`)* | Audio Modality (`Kore`) | 24kHz linear PCM audio buffer encapsulated into 44-byte RIFF WAV container + model attribution |
 | `/api/planning/quick-suggest` | `gemini-3.5-flash` | JSON / Text | Low-latency financial recommendations with categorized tags |
-| `/api/planning/tts-briefing` | `gemini-3.5-flash` | Audio Modality (`Kore`) | 24kHz linear PCM audio buffer encapsulated into 44-byte RIFF WAV container |
-| `/api/planning/search-vendors` | `gemini-3.5-flash` | Tool Grounding | Live Google Search market rates and citation links |
+| `/api/planning/search-vendors` | `gemini-3.5-flash` | Tool Grounding (`googleSearch`) | Live Google Search market rates and citation links |
+| `/api/planning/maps-vendors` | `gemini-3.5-flash` | Tool Grounding (`googleMaps`) | Google Maps venue locations and verified place references |
+| `/api/planning/chat-planner` | `gemini-3.5-flash` | Conversational JSON | Interactive planning assistant synthesizing custom blueprints and dynamic SVG branding |
+arch-vendors` | `gemini-3.5-flash` | Tool Grounding | Live Google Search market rates and citation links |
 | `/api/planning/maps-vendors` | `gemini-3.5-flash` | Tool Grounding | Google Maps venue locations and verified place references |
 | `/api/planning/chat-planner` | `gemini-3.5-flash` | Conversational JSON | Interactive planning assistant synthesizing custom blueprints on the fly |
 
@@ -208,23 +215,33 @@ Celebranza includes a native Node.js test suite validating financial formulas, d
 npm test
 ```
 
-### Test Suite Coverage:
+### Verified Test Execution Output:
 ```
-✔ sanitizeInput limits string lengths and trims whitespace
-✔ sanitizeSvg strips script, iframe, and inline event handlers
-✔ addWavHeader generates a compliant 44-byte RIFF WAV audio buffer
-✔ budget allocation math balances total expenditure and percentages
-✔ API mock handles valid structured response with source: "gemini"
-✔ formatCurrencyINR formats Indian Lakhs accurately (₹15,00,000)
-✔ formatLakhsShort formats condensed notation (15.0L)
-✔ calculateEventProgress clamps between 0 and 100
-✔ calculateBudgetSummary computes spent, remaining, and percentage
-✔ filterVendors accurately filters by status and search text
-✔ validateEventInput handles valid and invalid payload
-✔ calculateRSVPSummary aggregates accepted, declined, pending, and seats
-✔ checkCategoryBudgetWarning detects categories exceeding 80% allocation
+> celebranza@1.0.0 test
+> tsx --test src/**/*.test.ts
 
-Summary: 13 passed, 0 failed, 100% assertion pass rate.
+✔ sanitizeInput limits string lengths and trims whitespace (0.568372ms)
+✔ sanitizeSvg strips script, iframe, and inline event handlers (0.337711ms)
+✔ addWavHeader generates a compliant 44-byte RIFF WAV audio buffer (0.18339ms)
+✔ budget allocation math balances total expenditure and percentages (0.115628ms)
+✔ API mock handles valid structured response with source: "gemini" (0.089636ms)
+✔ escapeXml safely encodes &, <, >, and quotes (0.084614ms)
+✔ safeJsonParse parses clean and markdown wrapped json with fallback (0.317989ms)
+✔ formatCurrencyINR formats Indian Lakhs accurately (0.625371ms)
+✔ formatLakhsShort formats condensed notation (0.10866ms)
+✔ calculateEventProgress clamps between 0 and 100 (0.095209ms)
+✔ calculateBudgetSummary computes spent, remaining, and percentage (0.113272ms)
+✔ filterVendors accurately filters by status and search text (0.138443ms)
+✔ validateEventInput handles valid and invalid payload (0.115634ms)
+✔ calculateRSVPSummary aggregates accepted, declined, pending, and seats (0.126759ms)
+✔ checkCategoryBudgetWarning detects categories exceeding 80% allocation (0.095238ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
 ```
 
 ---
@@ -293,13 +310,14 @@ Provides strategic financial allocations and contingency recommendations.
   ```
 
 ### `POST /api/planning/tts-briefing`
-Returns synthesized audio briefing for active celebration.
-- **Body:** `{ "eventTitle": "Sunset Beach Wedding", "daysLeft": 95, "progress": 47, "budgetSpent": "56%" }`
+Returns synthesized audio briefing for active celebration with dedicated TTS models.
+- **Body:** `{ "eventTitle": "Sunset Beach Wedding", "daysLeft": 95, "progress": 47, "upcomingTask": "Finalize floral arch and sound check", "budgetSpent": "56%" }`
 - **Response:**
   ```json
   {
     "success": true,
     "source": "gemini",
+    "model": "gemini-3.8-flash-tts",
     "audioDataUrl": "data:audio/wav;base64,UklGR...",
     "briefingText": "Good morning! Here is your executive briefing for Sunset Beach Wedding..."
   }

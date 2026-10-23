@@ -5,6 +5,13 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { GoogleGenAI, Type } from '@google/genai';
+import {
+  sanitizeInput,
+  sanitizeSvg,
+  escapeXml,
+  safeJsonParse,
+  addWavHeader,
+} from './src/server/helpers.ts';
 
 dotenv.config();
 
@@ -13,6 +20,13 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+
+// Canonical Gemini Models for Celebranza
+const MODELS = {
+  text: 'gemini-3.5-flash',
+  tts: 'gemini-3.8-flash-tts',
+  ttsFallback: 'gemini-3.8-flash-lite-tts',
+};
 
 // Trust proxy headers for reverse proxies (Vercel, Cloudflare, AWS)
 app.set('trust proxy', 1);
@@ -25,9 +39,21 @@ app.use(
   })
 );
 
-// CORS headers & OPTIONS preflight handling
+// CORS headers & OPTIONS preflight handling restricted to own domain + development
+const ALLOWED_ORIGIN = process.env.APP_URL || 'https://celebranza.vercel.app';
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  if (
+    origin &&
+    (origin === ALLOWED_ORIGIN ||
+      origin.includes('localhost') ||
+      origin.includes('127.0.0.1') ||
+      origin.endsWith('.vercel.app'))
+  ) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') {
@@ -46,9 +72,10 @@ app.use((req, _res, next) => {
   next();
 });
 
-app.use(express.json({ limit: '5mb' }));
+// Request body size limit (reduced to 50kb for tighter API exposure)
+app.use(express.json({ limit: '50kb' }));
 
-// API Rate Limiter (100 requests per 15 min window)
+// General API Rate Limiter (100 requests per 15 min window)
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -61,7 +88,23 @@ const apiLimiter = rateLimit({
   },
 });
 
+// Stricter Per-Route Limiter for costly Gemini AI features (20 calls per 15 min window)
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    source: 'fallback',
+    error: 'AI generation limit reached (20 requests per 15 minutes). Please wait a moment.',
+  },
+});
+
 app.use('/api/', apiLimiter);
+app.use('/api/planning/one-prompt-planner', aiLimiter);
+app.use('/api/planning/tts-briefing', aiLimiter);
+app.use('/api/planning/chat-planner', aiLimiter);
 
 // Server-side Gemini Client
 const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || '';
@@ -78,79 +121,6 @@ if (apiKey) {
   });
 }
 
-// Input sanitizer & length capping
-function sanitizeInput(text: any, maxLength: number = 600): string {
-  if (typeof text !== 'string') return '';
-  return text.trim().slice(0, maxLength);
-}
-
-// Vector SVG sanitizer (strips scripts, iframes, inline event handlers)
-function sanitizeSvg(svg: string): string {
-  if (!svg || typeof svg !== 'string') return '';
-  return svg
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<foreignObject[\s\S]*?<\/foreignObject>/gi, '')
-    .replace(/<iframe[\s\S]*?<\/iframe>/gi, '')
-    .replace(/\son\w+\s*=\s*["'][^"']*["']/gi, '')
-    .replace(/javascript:/gi, '')
-    .trim();
-}
-
-// Safe JSON parser resilient to LLM markdown formatting, bad control characters, and unescaped newlines
-function safeJsonParse<T = any>(rawText: string, fallback: T): T {
-  if (!rawText || typeof rawText !== 'string') return fallback;
-  try {
-    return JSON.parse(rawText);
-  } catch {
-    try {
-      let cleaned = rawText.replace(/```(?:json)?\s*([\s\S]*?)\s*```/i, '$1').trim();
-      // Remove bad control characters (0x00 - 0x1F) except standard whitespace
-      cleaned = cleaned.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
-      return JSON.parse(cleaned);
-    } catch {
-      const match = rawText.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
-      if (match) {
-        try {
-          const stripped = match[0].replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
-          return JSON.parse(stripped);
-        } catch {}
-      }
-      return fallback;
-    }
-  }
-}
-
-// PCM 16-bit 24kHz to WAV header wrapper (44-byte RIFF)
-function addWavHeader(
-  pcmBuffer: Buffer,
-  sampleRate: number = 24000,
-  numChannels: number = 1,
-  bitDepth: number = 16
-): Buffer {
-  if (pcmBuffer.length >= 4 && pcmBuffer.toString('ascii', 0, 4) === 'RIFF') {
-    return pcmBuffer;
-  }
-  const byteRate = sampleRate * numChannels * (bitDepth / 8);
-  const blockAlign = numChannels * (bitDepth / 8);
-  const header = Buffer.alloc(44);
-
-  header.write('RIFF', 0);
-  header.writeUInt32LE(36 + pcmBuffer.length, 4);
-  header.write('WAVE', 8);
-  header.write('fmt ', 12);
-  header.writeUInt32LE(16, 16);
-  header.writeUInt16LE(1, 20); // PCM
-  header.writeUInt16LE(numChannels, 22);
-  header.writeUInt32LE(sampleRate, 24);
-  header.writeUInt32LE(byteRate, 28);
-  header.writeUInt16LE(blockAlign, 32);
-  header.writeUInt16LE(bitDepth, 34);
-  header.write('data', 36);
-  header.writeUInt32LE(pcmBuffer.length, 40);
-
-  return Buffer.concat([header, pcmBuffer]);
-}
-
 // Robust wrapper for Gemini model calls with transient 503 high-demand retry
 async function generateContentWithRetry(aiClient: any, params: any, maxRetries = 2): Promise<any> {
   let lastErr;
@@ -159,7 +129,12 @@ async function generateContentWithRetry(aiClient: any, params: any, maxRetries =
       return await aiClient.models.generateContent(params);
     } catch (err: any) {
       lastErr = err;
-      const is503 = err?.status === 503 || (err?.message && (err.message.includes('503') || err.message.includes('high demand') || err.message.includes('UNAVAILABLE')));
+      const is503 =
+        err?.status === 503 ||
+        (err?.message &&
+          (err.message.includes('503') ||
+            err.message.includes('high demand') ||
+            err.message.includes('UNAVAILABLE')));
       if (is503 && attempt < maxRetries) {
         console.warn(`[Gemini 503 retry] Model busy, retrying attempt ${attempt + 1}/${maxRetries} after backoff...`);
         await new Promise((res) => setTimeout(res, (attempt + 1) * 900));
@@ -170,6 +145,29 @@ async function generateContentWithRetry(aiClient: any, params: any, maxRetries =
   }
   throw lastErr;
 }
+
+// Text-to-Speech synthesis with dedicated TTS models and fallback
+async function synthesize(text: string): Promise<{ b64: string; model: string } | null> {
+  if (!ai) return null;
+  for (const model of [MODELS.tts, MODELS.ttsFallback]) {
+    try {
+      const r = await generateContentWithRetry(ai, {
+        model,
+        contents: [{ role: 'user', parts: [{ text }] }],
+        config: {
+          responseModalities: ['AUDIO'],
+          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
+        },
+      });
+      const b64 = r.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+      if (b64) return { b64, model };
+    } catch (e: any) {
+      console.error(`TTS ${model} failed:`, e.message);
+    }
+  }
+  return null;
+}
+
 
 // Low-latency quick suggestion endpoint using gemini-3.5-flash
 app.post('/api/planning/quick-suggest', async (req: Request, res: Response) => {
@@ -191,7 +189,7 @@ app.post('/api/planning/quick-suggest', async (req: Request, res: Response) => {
 
   try {
     const response = await generateContentWithRetry(ai, {
-      model: 'gemini-3.5-flash',
+      model: MODELS.text,
       contents: `Provide 3 high-value planning tips and 3 keyword tags for a ${eventType || 'wedding'} with budget of ${budget} at phase "${currentPhase || 'Planning'}". Specific query: ${prompt || 'Optimize my budget and milestones'}. Return JSON with "suggestion" (clean string) and "tags" (array of 3 short strings).`,
       config: {
         responseMimeType: 'application/json',
@@ -224,7 +222,7 @@ app.post('/api/planning/quick-suggest', async (req: Request, res: Response) => {
     return res.json({
       success: true,
       source: 'gemini',
-      model: 'gemini-3.5-flash',
+      model: MODELS.text,
       data: {
         suggestion: suggestionText,
         tags: tagsList,
@@ -263,7 +261,7 @@ app.post('/api/planning/search-vendors', async (req: Request, res: Response) => 
 
   try {
     const response = await generateContentWithRetry(ai, {
-      model: 'gemini-3.5-flash',
+      model: MODELS.text,
       contents: `Search for real, up-to-date vendor information: ${searchQuery}. Provide an authoritative, concise summary of market rates, popular options, and key negotiation points. Keep it professional.`,
       config: {
         tools: [{ googleSearch: {} }],
@@ -285,7 +283,7 @@ app.post('/api/planning/search-vendors', async (req: Request, res: Response) => 
     return res.json({
       success: true,
       source: 'gemini',
-      model: 'gemini-3.5-flash',
+      model: MODELS.text,
       summary: response.text || 'Vendor search complete.',
       sources: sources.slice(0, 5),
     });
@@ -323,7 +321,7 @@ app.post('/api/planning/maps-vendors', async (req: Request, res: Response) => {
 
   try {
     const response = await generateContentWithRetry(ai, {
-      model: 'gemini-3.5-flash',
+      model: MODELS.text,
       contents: `Find real, top-rated ${targetCategory} in or around ${targetLocation}. Describe 3-4 premier options with their specialties and neighborhood.`,
       config: {
         tools: [{ googleMaps: {} }],
@@ -345,7 +343,7 @@ app.post('/api/planning/maps-vendors', async (req: Request, res: Response) => {
     return res.json({
       success: true,
       source: 'gemini',
-      model: 'gemini-3.5-flash',
+      model: MODELS.text,
       summary: response.text || 'Premier locations identified.',
       places: places.slice(0, 5),
     });
@@ -363,11 +361,16 @@ app.post('/api/planning/maps-vendors', async (req: Request, res: Response) => {
   }
 });
 
-// Text-to-Speech audio briefing endpoint with raw PCM -> WAV header conversion
+// Text-to-Speech audio briefing endpoint with raw PCM -> WAV header conversion & multi-model fallback
 app.post('/api/planning/tts-briefing', async (req: Request, res: Response) => {
   const { eventTitle, daysLeft, progress, upcomingTask, budgetSpent } = req.body;
   const cleanTitle = sanitizeInput(eventTitle, 100);
-  const briefingText = `Good morning! Here is your executive briefing for ${cleanTitle || 'your celebration'}. You are ${daysLeft || 60} days away, with overall readiness at ${progress || 50} percent. Your key next milestone is "${upcomingTask || 'Finalize catering tastings'}". Budget utilization is currently at ${budgetSpent || 'on track'}. Everything is on track for an unforgettable celebration!`;
+  const safeDaysLeft = Number(daysLeft) || 60;
+  const safeProgress = Number(progress) || 50;
+  const safeUpcomingTask = sanitizeInput(upcomingTask, 120) || 'Finalize catering tastings';
+  const safeBudgetSpent = sanitizeInput(budgetSpent, 30) || 'on track';
+
+  const briefingText = `Good morning! Here is your executive briefing for ${cleanTitle || 'your celebration'}. You are ${safeDaysLeft} days away, with overall readiness at ${safeProgress} percent. Your key next milestone is "${safeUpcomingTask}". Budget utilization is currently at ${safeBudgetSpent}. Everything is on track for an unforgettable celebration!`;
 
   if (!ai) {
     return res.json({
@@ -378,52 +381,25 @@ app.post('/api/planning/tts-briefing', async (req: Request, res: Response) => {
     });
   }
 
-  try {
-    const response = await generateContentWithRetry(ai, {
-      model: 'gemini-3.5-flash',
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: briefingText }],
-        },
-      ],
-      config: {
-        responseModalities: ['AUDIO'],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Kore' },
-          },
-        },
-      },
-    });
-
-    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-    if (base64Audio) {
-      const pcmBuffer = Buffer.from(base64Audio, 'base64');
-      const wavBuffer = addWavHeader(pcmBuffer, 24000, 1, 16);
-      return res.json({
-        success: true,
-        source: 'gemini',
-        audioDataUrl: `data:audio/wav;base64,${wavBuffer.toString('base64')}`,
-        briefingText,
-      });
-    }
-
+  const result = await synthesize(briefingText);
+  if (result) {
+    const pcmBuffer = Buffer.from(result.b64, 'base64');
+    const wavBuffer = addWavHeader(pcmBuffer, 24000, 1, 16);
     return res.json({
-      success: false,
-      source: 'fallback',
-      error: 'Audio part was not returned by model',
-      fallbackText: briefingText,
-    });
-  } catch (err: any) {
-    console.error('TTS error:', err.message);
-    return res.json({
-      success: false,
-      source: 'fallback',
-      error: err.message,
-      fallbackText: briefingText,
+      success: true,
+      source: 'gemini',
+      model: result.model,
+      audioDataUrl: `data:audio/wav;base64,${wavBuffer.toString('base64')}`,
+      briefingText,
     });
   }
+
+  return res.json({
+    success: false,
+    source: 'fallback',
+    error: 'Audio generation failed across all TTS models.',
+    fallbackText: briefingText,
+  });
 });
 
 // Comprehensive AI Planning Assistant endpoint
@@ -441,7 +417,7 @@ app.post('/api/planning/ai-assistant', async (req: Request, res: Response) => {
 
   try {
     const response = await generateContentWithRetry(ai, {
-      model: 'gemini-3.5-flash',
+      model: MODELS.text,
       contents: `User Query: ${prompt}`,
       config: {
         systemInstruction: `You are an expert luxury event planning director for Celebranza. 
@@ -453,7 +429,7 @@ Provide clear, professional, well-formatted actionable advice. Avoid robot talk 
     return res.json({
       success: true,
       source: 'gemini',
-      model: 'gemini-3.5-flash',
+      model: MODELS.text,
       reply: response.text || 'Planning recommendations ready.',
     });
   } catch (err: any) {
@@ -466,16 +442,19 @@ Provide clear, professional, well-formatted actionable advice. Avoid robot talk 
   }
 });
 
-// Helper for generating dynamic, elegant SVG logo emblems
+// Helper for generating dynamic, elegant SVG logo emblems with strict XML escaping
 function generateSvgLogo(title: string, type: string, theme: string): string {
-  const cleanTitle = (title || 'Celebranza Event').trim();
-  const words = cleanTitle.split(/\s+/).filter(Boolean);
-  const initials = words.length >= 2
-    ? `${words[0][0]}&${words[1][0]}`.toUpperCase()
-    : cleanTitle.slice(0, 3).toUpperCase();
+  const rawTitle = (title || 'Celebranza Event').trim();
+  const safeTitle = escapeXml(rawTitle);
+  const safeTheme = escapeXml(theme || '');
+  const words = rawTitle.split(/\s+/).filter(Boolean);
+  const initials =
+    words.length >= 2
+      ? `${escapeXml(words[0][0])}&amp;${escapeXml(words[1][0])}`.toUpperCase()
+      : escapeXml(rawTitle.slice(0, 3)).toUpperCase();
 
-  const isWedding = type.toLowerCase().includes('wedding') || cleanTitle.includes('&');
-  const isBirthday = type.toLowerCase().includes('birthday');
+  const isWedding = (type || '').toLowerCase().includes('wedding') || rawTitle.includes('&');
+  const isBirthday = (type || '').toLowerCase().includes('birthday');
 
   if (isWedding) {
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
@@ -495,8 +474,8 @@ function generateSvgLogo(title: string, type: string, theme: string): string {
   <circle cx="100" cy="100" r="68" fill="none" stroke="url(#wg)" stroke-width="2.5"/>
   <path d="M60 100 C70 70, 130 70, 140 100 C130 130, 70 130, 60 100 Z" fill="none" stroke="url(#wg)" stroke-width="1.5" opacity="0.4"/>
   <text x="100" y="106" font-family="'DM Serif Display', Georgia, serif" font-size="28" font-weight="bold" fill="url(#wg)" text-anchor="middle" letter-spacing="1">${initials}</text>
-  <text x="100" y="142" font-family="'Inter', sans-serif" font-size="8" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">${cleanTitle.toUpperCase()}</text>
-  <text x="100" y="156" font-family="'DM Serif Display', Georgia, serif" font-style="italic" font-size="8" fill="#F4A261" text-anchor="middle">${theme ? theme.slice(0, 30) : 'From vows to forever'}</text>
+  <text x="100" y="142" font-family="'Inter', sans-serif" font-size="8" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">${safeTitle.toUpperCase()}</text>
+  <text x="100" y="156" font-family="'DM Serif Display', Georgia, serif" font-style="italic" font-size="8" fill="#F4A261" text-anchor="middle">${safeTheme ? safeTheme.slice(0, 30) : 'From vows to forever'}</text>
 </svg>`;
   }
 
@@ -517,7 +496,7 @@ function generateSvgLogo(title: string, type: string, theme: string): string {
   <polygon points="100,28 165,65 165,140 100,178 35,140 35,65" fill="none" stroke="url(#bg-g)" stroke-width="2.5"/>
   <circle cx="100" cy="100" r="50" fill="none" stroke="#F4A261" stroke-width="1.5" stroke-dasharray="3 3"/>
   <text x="100" y="108" font-family="'DM Serif Display', Georgia, serif" font-size="30" font-weight="bold" fill="url(#bg-g)" text-anchor="middle">${initials}</text>
-  <text x="100" y="142" font-family="'Inter', sans-serif" font-size="8.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.5">${cleanTitle.toUpperCase()}</text>
+  <text x="100" y="142" font-family="'Inter', sans-serif" font-size="8.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.5">${safeTitle.toUpperCase()}</text>
   <text x="100" y="156" font-family="'Inter', sans-serif" font-size="7.5" font-weight="500" fill="#E07A5F" text-anchor="middle">CELEBRATE IN STYLE</text>
 </svg>`;
   }
@@ -540,7 +519,7 @@ function generateSvgLogo(title: string, type: string, theme: string): string {
   <polygon points="100,45 145,125 55,125" fill="none" stroke="url(#cg)" stroke-width="1.5" opacity="0.5"/>
   <circle cx="100" cy="85" r="7" fill="url(#cg)"/>
   <text x="100" y="116" font-family="'DM Serif Display', Georgia, serif" font-size="24" font-weight="bold" fill="#FFFFFF" text-anchor="middle">${initials}</text>
-  <text x="100" y="148" font-family="'Inter', sans-serif" font-size="8" font-weight="700" fill="#2DD4BF" text-anchor="middle" letter-spacing="1.5">${cleanTitle.toUpperCase()}</text>
+  <text x="100" y="148" font-family="'Inter', sans-serif" font-size="8" font-weight="700" fill="#2DD4BF" text-anchor="middle" letter-spacing="1.5">${safeTitle.toUpperCase()}</text>
   <text x="100" y="162" font-family="'Inter', sans-serif" font-size="7.5" font-weight="500" fill="#9CA3AF" text-anchor="middle">CONNECT &amp; CELEBRATE</text>
 </svg>`;
 }
@@ -609,7 +588,7 @@ Provide structured JSON with:
    }`;
 
       const geminiResponse = await generateContentWithRetry(ai, {
-        model: 'gemini-3.5-flash',
+        model: MODELS.text,
         contents: `Conversation History: ${JSON.stringify(history.slice(-3))}\nUser Input: ${userQuery}`,
         config: {
           systemInstruction,
@@ -618,15 +597,28 @@ Provide structured JSON with:
       });
 
       const parsed = safeJsonParse(geminiResponse.text || '{}', {} as any);
+      const plan = parsed.eventPlan;
+      const svg = sanitizeSvg(
+        generateSvgLogo(plan?.title || detectedTitle, plan?.type || eventType, plan?.tagline || '')
+      );
+      const logoDataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 
       return res.json({
         success: true,
         source: 'gemini',
-        model: 'gemini-3.5-flash',
-        reply: parsed.reply || 'Event plan and blueprint ready.',
-        eventPlan: parsed.eventPlan ? {
-          ...parsed.eventPlan,
-        } : null,
+        model: MODELS.text,
+        reply: parsed.reply || 'Event plan ready.',
+        eventPlan: plan
+          ? {
+              ...plan,
+              logoImage: logoDataUrl,
+            }
+          : null,
+        logo: {
+          name: plan?.title || detectedTitle,
+          svg,
+          dataUrl: logoDataUrl,
+        },
       });
     } catch (err: any) {
       console.error('Gemini chat-planner error:', err);
@@ -716,6 +708,22 @@ app.post('/api/planning/one-prompt-planner', async (req: Request, res: Response)
   // Gemini API Grounding Execution with Guaranteed Structured Output
   if (ai) {
     try {
+      // Step 1: Real Google Search Grounding to fetch authentic local rates as plain text
+      let searchGroundingText = '';
+      try {
+        const searchRes = await generateContentWithRetry(ai, {
+          model: MODELS.text,
+          contents: `Search realistic wedding/event costs, venue banquet pricing, catering rates per plate, and decor packages in ${city}, India. Summarize typical price ranges and premier venues in 2-3 concise sentences.`,
+          config: {
+            tools: [{ googleSearch: {} }],
+          },
+        });
+        searchGroundingText = searchRes.text || '';
+      } catch (searchErr: any) {
+        console.warn('Google Search grounding pre-fetch warning:', searchErr.message);
+      }
+
+      // Step 2: Structured JSON schema call conditioned on real-time market search text
       const onePromptSchema = {
         type: Type.OBJECT,
         properties: {
@@ -806,8 +814,8 @@ Analyze the user's event prompt and generate a completely grounded, mathematical
 3. Compute a mathematically sound budget breakdown matching the total budget exactly.`;
 
       const response = await generateContentWithRetry(ai, {
-        model: 'gemini-3.5-flash',
-        contents: `Plan this celebration with realistic market estimates: "${prompt}"`,
+        model: MODELS.text,
+        contents: `${searchGroundingText ? `Real-time market context from Google Search:\n${searchGroundingText}\n\n` : ''}Plan this celebration with realistic market estimates: "${prompt}"`,
         config: {
           systemInstruction,
           responseMimeType: 'application/json',
@@ -816,13 +824,20 @@ Analyze the user's event prompt and generate a completely grounded, mathematical
       });
 
       const parsed = safeJsonParse(response.text || '{}', {} as any);
+      const cleanTitle = parsed.title || prompt;
+      const logoSvg = sanitizeSvg(
+        generateSvgLogo(cleanTitle, parsed.type || eventType, parsed.tagline || parsed.city || city)
+      );
+      const logoDataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(logoSvg)}`;
 
       return res.json({
         success: true,
         source: 'gemini',
-        model: 'gemini-3.5-flash',
+        model: MODELS.text,
         data: {
           ...parsed,
+          logoSvg,
+          logoDataUrl,
           heroImage: parsed.type === 'wedding'
             ? 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80'
             : parsed.type === 'birthday'
