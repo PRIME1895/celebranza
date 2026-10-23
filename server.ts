@@ -127,6 +127,26 @@ function addWavHeader(
   return Buffer.concat([header, pcmBuffer]);
 }
 
+// Robust wrapper for Gemini model calls with transient 503 high-demand retry
+async function generateContentWithRetry(aiClient: any, params: any, maxRetries = 2): Promise<any> {
+  let lastErr;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await aiClient.models.generateContent(params);
+    } catch (err: any) {
+      lastErr = err;
+      const is503 = err?.status === 503 || (err?.message && (err.message.includes('503') || err.message.includes('high demand') || err.message.includes('UNAVAILABLE')));
+      if (is503 && attempt < maxRetries) {
+        console.warn(`[Gemini 503 retry] Model busy, retrying attempt ${attempt + 1}/${maxRetries} after backoff...`);
+        await new Promise((res) => setTimeout(res, (attempt + 1) * 900));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastErr;
+}
+
 // Low-latency quick suggestion endpoint using gemini-3.5-flash
 app.post('/api/planning/quick-suggest', async (req: Request, res: Response) => {
   const eventType = sanitizeInput(req.body.eventType, 50);
@@ -146,7 +166,7 @@ app.post('/api/planning/quick-suggest', async (req: Request, res: Response) => {
   }
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRetry(ai, {
       model: 'gemini-3.5-flash',
       contents: `Provide 3 high-value planning tips and 3 keyword tags for a ${eventType || 'wedding'} with budget of ${budget} at phase "${currentPhase || 'Planning'}". Specific query: ${prompt || 'Optimize my budget and milestones'}. Return JSON with "suggestion" (clean string) and "tags" (array of 3 short strings).`,
       config: {
@@ -218,7 +238,7 @@ app.post('/api/planning/search-vendors', async (req: Request, res: Response) => 
   }
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRetry(ai, {
       model: 'gemini-3.5-flash',
       contents: `Search for real, up-to-date vendor information: ${searchQuery}. Provide an authoritative, concise summary of market rates, popular options, and key negotiation points. Keep it professional.`,
       config: {
@@ -278,7 +298,7 @@ app.post('/api/planning/maps-vendors', async (req: Request, res: Response) => {
   }
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRetry(ai, {
       model: 'gemini-3.5-flash',
       contents: `Find real, top-rated ${targetCategory} in or around ${targetLocation}. Describe 3-4 premier options with their specialties and neighborhood.`,
       config: {
@@ -335,7 +355,7 @@ app.post('/api/planning/tts-briefing', async (req: Request, res: Response) => {
   }
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRetry(ai, {
       model: 'gemini-3.5-flash',
       contents: [
         {
@@ -396,7 +416,7 @@ app.post('/api/planning/ai-assistant', async (req: Request, res: Response) => {
   }
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRetry(ai, {
       model: 'gemini-3.5-flash',
       contents: `User Query: ${prompt}`,
       config: {
@@ -564,7 +584,7 @@ Provide structured JSON with:
      "heroImage": "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80"
    }`;
 
-      const geminiResponse = await ai.models.generateContent({
+      const geminiResponse = await generateContentWithRetry(ai, {
         model: 'gemini-3.5-flash',
         contents: `Conversation History: ${JSON.stringify(history.slice(-3))}\nUser Input: ${userQuery}`,
         config: {
@@ -761,7 +781,7 @@ Analyze the user's event prompt and generate a completely grounded, mathematical
 2. Select an authentic luxury or landmark venue in that city (e.g., Lake Pichola/Jagmandir/Udaivilas in Udaipur, Morjim/Taj in Goa, Bandra/Colaba in Mumbai, Palace Road in Bengaluru).
 3. Compute a mathematically sound budget breakdown matching the total budget exactly.`;
 
-      const response = await ai.models.generateContent({
+      const response = await generateContentWithRetry(ai, {
         model: 'gemini-3.5-flash',
         contents: `Plan this celebration with realistic market estimates: "${prompt}"`,
         config: {
