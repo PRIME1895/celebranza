@@ -1,0 +1,208 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #0d0f14;
+    color: #f3f4f6;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif-display {
+    font-family: 'DM Serif Display', Georgia, serif;
+    letter-spacing: -0.015em;
+  }
+
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #11131a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #282c37;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3e4455;
+  }
+}
+
+.font-editorial,
+.font-serif-display {
+  font-family: 'DM Serif Display', Georgia, serif;
+}
+
+/* Light Theme Styling - Warm Editorial Cream Matching Mockup Blueprint */
+[data-theme='light'] body {
+  background-color: #FAF7F2 !important;
+  color: #1C1917 !important;
+}
+
+[data-theme='light'] ::-webkit-scrollbar-track {
+  background: #F5EFE6;
+}
+[data-theme='light'] ::-webkit-scrollbar-thumb {
+  background: #D8CEBE;
+}
+[data-theme='light'] ::-webkit-scrollbar-thumb:hover {
+  background: #C4B7A3;
+}
+
+[data-theme='light'] .bg-\[\#0d0f14\] {
+  background-color: #FAF7F2 !important;
+}
+[data-theme='light'] .bg-\[\#111319\] {
+  background-color: #F5EFE6 !important;
+}
+[data-theme='light'] .bg-\[\#111319\]\/90,
+[data-theme='light'] .bg-\[\#111319\]\/95 {
+  background-color: rgba(245, 239, 230, 0.95) !important;
+}
+[data-theme='light'] .bg-\[\#161822\],
+[data-theme='light'] .bg-\[\#161821\] {
+  background-color: #FFFFFF !important;
+  box-shadow: 0 4px 20px -2px rgba(60, 40, 20, 0.05);
+}
+[data-theme='light'] .bg-\[\#181a24\],
+[data-theme='light'] .bg-\[\#1a1c24\],
+[data-theme='light'] .bg-\[\#191b26\] {
+  background-color: #F8F3EB !important;
+}
+[data-theme='light'] .bg-zinc-900,
+[data-theme='light'] .bg-zinc-900\/80,
+[data-theme='light'] .bg-zinc-900\/90 {
+  background-color: #F3ECE2 !important;
+}
+[data-theme='light'] .bg-zinc-800 {
+  background-color: #E9E0D4 !important;
+}
+[data-theme='light'] .border-zinc-800,
+[data-theme='light'] .border-zinc-800\/80,
+[data-theme='light'] .border-zinc-800\/90,
+[data-theme='light'] .border-zinc-800\/60,
+[data-theme='light'] .border-zinc-700,
+[data-theme='light'] .border-zinc-700\/80 {
+  border-color: #E8DFD3 !important;
+}
+[data-theme='light'] .text-white {
+  color: #1C1917 !important;
+}
+[data-theme='light'] .text-zinc-100 {
+  color: #1C1917 !important;
+}
+[data-theme='light'] .text-zinc-200 {
+  color: #292524 !important;
+}
+[data-theme='light'] .text-zinc-300 {
+  color: #44403C !important;
+}
+[data-theme='light'] .text-zinc-400 {
+  color: #6B645C !important;
+}
+[data-theme='light'] .text-zinc-500 {
+  color: #8C8479 !important;
+}
+
+/* Ensure white text is retained on terracotta and primary colored buttons */
+[data-theme='light'] button.bg-\[\#E07A5F\],
+[data-theme='light'] .bg-\[\#E07A5F\] span,
+[data-theme='light'] .bg-\[\#E07A5F\] .text-white,
+[data-theme='light'] .bg-\[\#E07A5F\] {
+  color: #FFFFFF !important;
+}
+
+/* Ensure hero photo banner & dark media overlays preserve pristine white text in light mode */
+[data-theme='light'] .hero-overlay,
+[data-theme='light'] .hero-overlay h3,
+[data-theme='light'] .hero-overlay h4,
+[data-theme='light'] .hero-overlay p,
+[data-theme='light'] .hero-banner-card h3,
+[data-theme='light'] .hero-banner-card h4,
+[data-theme='light'] .hero-banner-card p {
+  color: #FFFFFF !important;
+}
+
+[data-theme='light'] .hero-overlay span,
+[data-theme='light'] .hero-banner-card span {
+  color: #E07A5F !important;
+}
+
+[data-theme='light'] .hero-banner-card {
+  background-color: #1a1724 !important;
+  border-color: #2e2638 !important;
+}
+
+/* Light mode badges for 80% visual warning system */
+[data-theme='light'] .bg-red-950\/40,
+[data-theme='light'] .bg-red-950\/25 {
+  background-color: #FFF1F2 !important;
+  border-color: #FCA5A5 !important;
+}
+[data-theme='light'] .text-red-300,
+[data-theme='light'] .text-red-200,
+[data-theme='light'] .text-red-200\/90 {
+  color: #DC2626 !important;
+}
+[data-theme='light'] .bg-red-900\/60 {
+  background-color: #FEE2E2 !important;
+  border-color: #FCA5A5 !important;
+  color: #B91C1C !important;
+}
+
+/* Light mode badges for RSVP cards */
+[data-theme='light'] .bg-emerald-950\/20 {
+  background-color: #F0FDF4 !important;
+  border-color: #86EFAC !important;
+}
+[data-theme='light'] .text-emerald-400 {
+  color: #16A34A !important;
+}
+[data-theme='light'] .bg-rose-950\/20 {
+  background-color: #FFF1F2 !important;
+  border-color: #FECDD3 !important;
+}
+[data-theme='light'] .text-rose-400 {
+  color: #E11D48 !important;
+}
+[data-theme='light'] .bg-amber-950\/20 {
+  background-color: #FFFBEB !important;
+  border-color: #FDE68A !important;
+}
+[data-theme='light'] .text-amber-400 {
+  color: #D97706 !important;
+}
+
+/* Print Styles for Export Event Summary */
+@media print {
+  aside, header, nav, .no-print {
+    display: none !important;
+  }
+  body {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
+
+/* Accessibility: High Visibility Focus Ring */
+:focus-visible {
+  outline: 2px solid #E07A5F !important;
+  outline-offset: 2px !important;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible,
+[tabindex="0"]:focus-visible {
+  outline: 2px solid #E07A5F !important;
+  outline-offset: 2px !important;
+}
+

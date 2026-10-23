@@ -1,0 +1,6 @@
+{
+  "name": "Celebranza - Event Planning Platform",
+  "description": "GenAI-powered planning platform for weddings, birthdays, and community events with real-time budgets, timelines, vendor management, and guest tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
