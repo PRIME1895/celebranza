@@ -14,6 +14,9 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
+// Trust proxy headers for reverse proxies (Vercel, Cloudflare, AWS)
+app.set('trust proxy', 1);
+
 // Security hardening
 app.use(
   helmet({
@@ -21,6 +24,27 @@ app.use(
     crossOriginEmbedderPolicy: false,
   })
 );
+
+// CORS headers & OPTIONS preflight handling
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+  next();
+});
+
+// Normalize request URL for Vercel serverless functions & rewrites
+app.use((req, _res, next) => {
+  if (!req.url.startsWith('/api') && req.originalUrl?.startsWith('/api')) {
+    req.url = req.originalUrl;
+  } else if (req.url.startsWith('/planning/')) {
+    req.url = '/api' + req.url;
+  }
+  next();
+});
 
 app.use(express.json({ limit: '5mb' }));
 
@@ -40,7 +64,7 @@ const apiLimiter = rateLimit({
 app.use('/api/', apiLimiter);
 
 // Server-side Gemini Client
-const apiKey = process.env.GEMINI_API_KEY || '';
+const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || '';
 let ai: GoogleGenAI | null = null;
 
 if (apiKey) {
@@ -886,8 +910,10 @@ Analyze the user's event prompt and generate a completely grounded, mathematical
   });
 });
 
-// Vite middleware integration for development / Static serve for production
+// Vite middleware integration for local development / Static serve for local production
 async function startServer() {
+  if (process.env.VERCEL) return;
+
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
@@ -907,4 +933,9 @@ async function startServer() {
   });
 }
 
-startServer();
+// Only listen on port when executed directly (local dev or container), not in Vercel serverless functions
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export default app;
