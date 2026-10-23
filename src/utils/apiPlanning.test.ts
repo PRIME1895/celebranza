@@ -1,54 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-// Test SVG Sanitization function logic
-function sanitizeSvg(svg: string): string {
-  if (!svg || typeof svg !== 'string') return '';
-  return svg
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<foreignObject[\s\S]*?<\/foreignObject>/gi, '')
-    .replace(/<iframe[\s\S]*?<\/iframe>/gi, '')
-    .replace(/\son\w+\s*=\s*["'][^"']*["']/gi, '')
-    .replace(/javascript:/gi, '')
-    .trim();
-}
+import { sanitizeInput, sanitizeSvg, escapeXml, safeJsonParse, addWavHeader } from '../server/helpers.ts';
 
-// Test Input Sanitization logic
-function sanitizeInput(text: any, maxLength: number = 600): string {
-  if (typeof text !== 'string') return '';
-  return text.trim().slice(0, maxLength);
-}
-
-// Test 24kHz 16-bit PCM to RIFF WAV header generation logic
-function addWavHeader(
-  pcmBuffer: Buffer,
-  sampleRate: number = 24000,
-  numChannels: number = 1,
-  bitDepth: number = 16
-): Buffer {
-  if (pcmBuffer.length >= 4 && pcmBuffer.toString('ascii', 0, 4) === 'RIFF') {
-    return pcmBuffer;
-  }
-  const byteRate = sampleRate * numChannels * (bitDepth / 8);
-  const blockAlign = numChannels * (bitDepth / 8);
-  const header = Buffer.alloc(44);
-
-  header.write('RIFF', 0);
-  header.writeUInt32LE(36 + pcmBuffer.length, 4);
-  header.write('WAVE', 8);
-  header.write('fmt ', 12);
-  header.writeUInt32LE(16, 16);
-  header.writeUInt16LE(1, 20); // PCM format
-  header.writeUInt16LE(numChannels, 22);
-  header.writeUInt32LE(sampleRate, 24);
-  header.writeUInt32LE(byteRate, 28);
-  header.writeUInt16LE(blockAlign, 32);
-  header.writeUInt16LE(bitDepth, 34);
-  header.write('data', 36);
-  header.writeUInt32LE(pcmBuffer.length, 40);
-
-  return Buffer.concat([header, pcmBuffer]);
-}
 
 test('sanitizeInput limits string lengths and trims whitespace', () => {
   const normal = sanitizeInput('  Udaipur Destination Wedding  ', 100);
@@ -127,11 +81,29 @@ test('API mock handles valid structured response with source: "gemini"', () => {
   const responsePayload = {
     success: true,
     source: 'gemini' as const,
-    model: 'gemini-2.5-flash',
+    model: 'gemini-3.5-flash',
     data: mockGeminiOutput,
   };
 
   assert.equal(responsePayload.source, 'gemini');
-  assert.equal(responsePayload.model, 'gemini-2.5-flash');
+  assert.equal(responsePayload.model, 'gemini-3.5-flash');
   assert.equal(responsePayload.data.expectedGuests, 200);
 });
+
+test('escapeXml safely encodes &, <, >, and quotes', () => {
+  const unsafe = 'Aria & Neil <Vows> "Forever"';
+  const safe = escapeXml(unsafe);
+  assert.equal(safe, 'Aria &amp; Neil &lt;Vows&gt; &quot;Forever&quot;');
+});
+
+test('safeJsonParse parses clean and markdown wrapped json with fallback', () => {
+  const rawMarkdown = '```json\n{"status":"ok","value":42}\n```';
+  const parsed = safeJsonParse(rawMarkdown, { status: 'fallback', value: 0 });
+  assert.equal(parsed.status, 'ok');
+  assert.equal(parsed.value, 42);
+
+  const invalid = 'not a json';
+  const fallbackVal = safeJsonParse(invalid, { default: true });
+  assert.equal(fallbackVal.default, true);
+});
+

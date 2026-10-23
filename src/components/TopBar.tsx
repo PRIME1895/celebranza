@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { EventItem } from '../types.ts';
 import { useAuth } from '../context/AuthContext.tsx';
+import { calculateDaysLeft } from '../utils/eventCalculations.ts';
 
 interface TopBarProps {
   events: EventItem[];
@@ -58,24 +59,36 @@ export const TopBar: React.FC<TopBarProps> = ({
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioError, setAudioError] = useState<string | null>(null);
   const [audioBriefingText, setAudioBriefingText] = useState<string | null>(null);
+  const [speakingModel, setSpeakingModel] = useState<string | null>(null);
 
   const handlePlayBriefing = async () => {
     setIsPlayingAudio(true);
     setAudioError(null);
     try {
+      const activeDays = daysLeft ?? calculateDaysLeft(selectedEvent.date);
+      const activeProgress = totalTasks > 0 ? Math.round((tasksCompleted / totalTasks) * 100) : 50;
+      const activeBudget = budgetSpentPercent != null ? `${budgetSpentPercent}%` : 'on track';
+      const activeTask = upcomingTaskTitle || 'Finalize decor theme and vendor confirmations';
+
       const response = await fetch('/api/planning/tts-briefing', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           eventTitle: selectedEvent.title,
-          daysLeft: daysLeft ?? 45,
-          progress: Math.round((tasksCompleted / (totalTasks || 1)) * 100),
-          upcomingTask: upcomingTaskTitle || 'Finalize decor theme and vendor confirmations',
-          budgetSpent: `${budgetSpentPercent ?? 0}%`,
+          daysLeft: activeDays,
+          progress: activeProgress,
+          upcomingTask: activeTask,
+          budgetSpent: activeBudget,
         }),
       });
 
       const data = await response.json();
+      if (data.model) {
+        setSpeakingModel(data.model);
+      } else {
+        setSpeakingModel(null);
+      }
+
       if (data.audioDataUrl) {
         setAudioBriefingText(data.briefingText || null);
         const audio = new Audio(data.audioDataUrl);
@@ -112,6 +125,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <header className="h-16 border-b border-zinc-800/80 bg-[#111319]/90 backdrop-blur px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40">
+
       {/* Event Selector */}
       <div className="flex items-center gap-3">
         {/* Event Selector Dropdown */}
@@ -341,13 +355,27 @@ export const TopBar: React.FC<TopBarProps> = ({
 
       {/* Audio briefing subtitle toast if audio played or error */}
       {audioBriefingText && (
-        <div className="fixed bottom-6 right-6 max-w-sm bg-[#1c1f2b] border border-zinc-700 p-3.5 rounded-2xl shadow-2xl z-50 text-xs text-zinc-300 space-y-1 animate-in fade-in">
-          <div className="flex items-center justify-between text-zinc-400 font-semibold text-[11px]">
-            <span className="flex items-center gap-1.5 text-[#E07A5F]">
+        <div className="fixed bottom-6 right-6 max-w-sm bg-[#1c1f2b] border border-zinc-700 p-3.5 rounded-2xl shadow-2xl z-50 text-xs text-zinc-300 space-y-1.5 animate-in fade-in">
+          <div className="flex items-center justify-between text-zinc-400 font-semibold text-[11px] gap-2">
+            <span className="flex items-center gap-1.5 text-[#E07A5F] shrink-0">
               <Volume2 className="w-3.5 h-3.5" />
-              Audio Briefing
+              Voice Briefing
             </span>
-            <button onClick={() => setAudioBriefingText(null)} className="text-zinc-500 hover:text-white">✕</button>
+            {speakingModel && (
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-zinc-800/90 text-emerald-400 border border-zinc-700/80 truncate">
+                {speakingModel}
+              </span>
+            )}
+            <button
+              onClick={() => {
+                setAudioBriefingText(null);
+                setSpeakingModel(null);
+              }}
+              aria-label="Dismiss audio briefing toast"
+              className="text-zinc-500 hover:text-white ml-auto"
+            >
+              ✕
+            </button>
           </div>
           <p className="line-clamp-3 italic text-zinc-300">{audioBriefingText}</p>
         </div>

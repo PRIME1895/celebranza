@@ -13,6 +13,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { EventItem } from '../types.ts';
+import { calculateDaysLeft } from '../utils/eventCalculations.ts';
 
 interface MobilePreviewFrameProps {
   events: EventItem[];
@@ -105,7 +106,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             <div className="space-y-3.5 pb-6">
               {events.map((ev) => {
                 const isSelected = ev.id === selectedEvent.id;
-                const days = ev.id === 'ev-1' ? 64 : ev.id === 'ev-2' ? 39 : 95;
+                const days = calculateDaysLeft(ev.date);
                 const progress = ev.id === 'ev-1' ? 68 : ev.id === 'ev-2' ? 45 : 22;
 
                 return (
